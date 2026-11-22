@@ -401,26 +401,10 @@ mtk_cam_res_copy_fmt_from_user(struct mtk_raw_pipeline *pipeline,
 			       struct mtk_cam_resource *res_user,
 			       struct v4l2_mbus_framefmt *dest)
 {
-	long bytes;
-	struct device *dev = pipeline->raw->devs[pipeline->id];
-
-	if (!res_user->sink_fmt) {
-		dev_info(dev,
-			 "%s:pipe(%d): sink_fmt can't be NULL for res ctrl\n",
-			 __func__, pipeline->id);
-
-		return -EINVAL;
-	}
-
-	bytes = copy_from_user(dest, (void *)res_user->sink_fmt,
-			       sizeof(*dest));
-	if (bytes) {
-		dev_info(dev,
-			 "%s:pipe(%d): copy_from_user on sink_fmt failed (%ld)\n",
-			 __func__, pipeline->id, bytes);
-		return -EINVAL;
-	}
-
+	memset(dest, 0, sizeof(*dest));
+	dest->width = res_user->sensor_res.width;
+	dest->height = res_user->sensor_res.height;
+	dest->code = res_user->sensor_res.code;
 	return 0;
 }
 
@@ -429,19 +413,9 @@ mtk_cam_res_copy_fmt_to_user(struct mtk_raw_pipeline *pipeline,
 			     struct mtk_cam_resource *res_user,
 			     struct v4l2_mbus_framefmt *src)
 {
-	long bytes;
-	struct device *dev = pipeline->raw->devs[pipeline->id];
-
-	/* return the fmt to the users */
-	bytes = copy_to_user((void *)res_user->sink_fmt, src, sizeof(*src));
-	if (bytes) {
-		dev_info(dev,
-			 "%s:pipe(%d): copy_to_user on sink_fmt failed (%ld)\n",
-			 __func__, pipeline->id, bytes);
-
-		return -EINVAL;
-	}
-
+	res_user->sensor_res.width = src->width;
+	res_user->sensor_res.height = src->height;
+	res_user->sensor_res.code = src->code;
 	return 0;
 }
 

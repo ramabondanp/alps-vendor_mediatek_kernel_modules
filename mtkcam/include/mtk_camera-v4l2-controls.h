@@ -137,6 +137,9 @@ struct mtk_cam_hdr_timestamp_info {
  *
  */
 struct mtk_cam_resource_sensor {
+	__u32 width;
+	__u32 height;
+	__u32 code;
 	struct v4l2_fract interval;
 	__u32 hblank;
 	__u32 vblank;
@@ -205,7 +208,6 @@ struct mtk_cam_resource_raw {
  *
  */
 struct mtk_cam_resource {
-	struct v4l2_mbus_framefmt *sink_fmt;
 	struct mtk_cam_resource_sensor sensor_res;
 	struct mtk_cam_resource_raw raw_res;
 	__u8 status;
