@@ -1,7 +1,7 @@
 /* SPDX-License-Identifier: GPL-2.0 WITH Linux-syscall-note */
 /*
  *
- * (C) COPYRIGHT 2011-2024 ARM Limited. All rights reserved.
+ * (C) COPYRIGHT 2011-2025 ARM Limited. All rights reserved.
  *
  * This program is free software and is provided to you under the terms of the
  * GNU General Public License version 2 as published by the Free Software
@@ -422,6 +422,22 @@ TRACE_EVENT(mali_jit_trim, TP_PROTO(size_t freed_pages), TP_ARGS(freed_pages),
 	    TP_fast_assign(__entry->freed_pages = freed_pages;),
 	    TP_printk("freed_pages=%zu", __entry->freed_pages));
 
+/* trace_mali_gpu_active_cycle_counter
+ *
+ * Tracepoint about GPU active cycles information
+ * @cpu_timestamp: Current CPU time in ns
+ * @gpu_active_cycles: Total active GPU cycles
+ */
+TRACE_EVENT(mali_gpu_active_cycle_counter,
+	    TP_PROTO(u32 gpu_id, u64 cpu_timestamp, u64 gpu_active_cycles),
+	    TP_ARGS(gpu_id, cpu_timestamp, gpu_active_cycles),
+	    TP_STRUCT__entry(__field(u32, gpu_id) __field(u64, cpu_timestamp)
+				     __field(u64, gpu_active_cycles)),
+	    TP_fast_assign(__entry->gpu_id = gpu_id; __entry->cpu_timestamp = cpu_timestamp;
+			   __entry->gpu_active_cycles = gpu_active_cycles;),
+	    TP_printk("gpu_id=%u cpu_timestamp=%llu gpu_active_cycles=%llu", __entry->gpu_id,
+		      __entry->cpu_timestamp, __entry->gpu_active_cycles));
+
 #if IS_ENABLED(CONFIG_MALI_MTK_MEMORY_DEBUG)
 DECLARE_EVENT_CLASS(mali_mem_trace_template,
 	TP_PROTO(uint32_t gpu_id, uint32_t pid, uint64_t size, uint64_t gpu_addr, const char *category),
@@ -436,7 +452,7 @@ DECLARE_EVENT_CLASS(mali_mem_trace_template,
 	TP_fast_assign(
 		__entry->gpu_id = gpu_id;
 		__entry->pid = pid;
-		__entry->size = size;
+		__entry->size = size << PAGE_SHIFT;
 		__entry->gpu_addr = gpu_addr;
 #if (LINUX_VERSION_CODE < KERNEL_VERSION(6, 10, 0))
 		__assign_str(category, category);

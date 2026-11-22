@@ -85,8 +85,13 @@ kbasep_pm_context_active_handle_suspend_locked(struct kbase_device *kbdev,
 	KBASE_KTRACE_ADD(kbdev, PM_CONTEXT_ACTIVE, NULL, (u64)c);
 
 	if (c == 1) {
-		if (r)
+		if (r) {
+			/* SUSPEND_HANDLER_ALWAYS_INCREASE always succeeds even without a GPU
+			 * present, as it's used to restore the active_count counter value due to
+			 * a prior failure to power down.
+			 */
 			return (suspend_handler != KBASE_PM_SUSPEND_HANDLER_ALWAYS_INCREASE);
+		}
 
 		/* First context active: Power on the GPU and
 		 * any cores requested by the policy

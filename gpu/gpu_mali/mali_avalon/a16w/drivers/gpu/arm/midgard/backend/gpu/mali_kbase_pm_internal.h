@@ -243,6 +243,23 @@ int kbase_pm_wait_for_desired_state(struct kbase_device *kbdev);
 int kbase_pm_killable_wait_for_desired_state(struct kbase_device *kbdev);
 
 /**
+ * kbase_pm_wait_for_desired_mcu_state - Wait for the desired mcu state to be
+ *                                       reached.
+ * @kbdev: The kbase device structure for the device (must be a valid pointer)
+ *
+ * This function is same as kbase_pm_wait_for_desired_state(), expect that it would
+ * only wait for MCU desired state.
+ *
+ * This is to prevent potential deadlock between the fault handler and any work
+ * attempting to power down the GPU. Power management will not allow L2 power down
+ * and the scheduler lock will most likely be held by the caller.
+ *
+ * Return: 0 on success, or -ETIMEDOUT code on timeout error, -ERESTARTSYS if the
+ *         wait was interrupted.
+ */
+int kbase_pm_wait_for_desired_mcu_state(struct kbase_device *kbdev);
+
+/**
  * kbase_pm_wait_for_l2_powered - Wait for the L2 cache to be powered on
  *
  * @kbdev: The kbase device structure for the device (must be a valid pointer)
@@ -758,13 +775,13 @@ static inline bool kbase_pm_no_mcu_core_pwroff(struct kbase_device *kbdev)
 }
 
 /**
- * kbase_pm_mcu_is_in_desired_state - Check if MCU is in stable ON/OFF state.
+ * kbase_pm_mcu_is_in_desired_state_locked - Check if MCU is in stable ON/OFF state.
  *
  * @kbdev: Device pointer
  *
  * Return: true if MCU is in stable ON/OFF state.
  */
-static inline bool kbase_pm_mcu_is_in_desired_state(struct kbase_device *kbdev)
+static inline bool kbase_pm_mcu_is_in_desired_state_locked(struct kbase_device *kbdev)
 {
 	bool in_desired_state = true;
 
@@ -781,15 +798,17 @@ static inline bool kbase_pm_mcu_is_in_desired_state(struct kbase_device *kbdev)
 }
 
 /**
- * kbase_pm_l2_is_in_desired_state - Check if L2 is in stable ON/OFF state.
+ * kbase_pm_l2_is_in_desired_state_locked - Check if L2 is in stable ON/OFF state.
  *
  * @kbdev: Device pointer
  *
  * Return: true if L2 is in stable ON/OFF state.
  */
-static inline bool kbase_pm_l2_is_in_desired_state(struct kbase_device *kbdev)
+static inline bool kbase_pm_l2_is_in_desired_state_locked(struct kbase_device *kbdev)
 {
 	bool in_desired_state = true;
+
+	lockdep_assert_held(&kbdev->hwaccess_lock);
 
 	if (kbase_pm_is_l2_desired(kbdev) && kbdev->pm.backend.l2_state != KBASE_L2_ON)
 		in_desired_state = false;
@@ -926,7 +945,31 @@ static inline void kbase_pm_disable_db_mirror_interrupt(struct kbase_device *kbd
 		kbdev->pm.backend.db_mirror_interrupt_enabled = false;
 	}
 }
-
+#if IS_ENABLED(CONFIG_GPU_MT6895)
+/**
+ * kbase_pm_apply_pmode_entry_wa - Apply the WA, before protected mode entry, to
+ *                                 disable the power control of SC on FW side
+ *                                 and if needed power up all the required cores
+ *                                 and finally perform the PDCA switching.
+ *
+ * @kbdev: Device pointer
+ *
+ * This function must be called with Scheduler lock held.
+ *
+ * Return: 0 if the WA was applied successfully, otherwise an error code.
+ */
+int kbase_pm_apply_pmode_entry_wa(struct kbase_device *kbdev);
+/**
+ * kbase_pm_apply_pmode_exit_wa - Apply the WA, after protected mode exit, to
+ *                                perform the PDCA switching and then re-enable
+ *                                the power control of SC on FW side.
+ *
+ * @kbdev: Device pointer
+ *
+ * This function must be called with Scheduler lock held.
+ */
+void kbase_pm_apply_pmode_exit_wa(struct kbase_device *kbdev);
+#endif /* CONFIG_GPU_MT6895 */
 /**
  * kbase_pm_l2_allow_mmu_page_migration - L2 state allows MMU page migration or not
  *

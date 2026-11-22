@@ -638,11 +638,12 @@ static void kbase_mmu_interrupt_process(struct kbase_device *kbdev, struct kbase
 #endif /* CONFIG_MALI_MTK_WORKQUEUE_TO_KTHREAD_WORKER */
 			dev_warn(kbdev->dev, "Page fault is already pending for as %u", as->number);
 			kbase_ctx_sched_release_ctx(kctx);
-		} else
+		} else {
 #if IS_ENABLED(CONFIG_MALI_MTK_KBASE_THREAD_DEBUG)
 			mali_kthread_event("queue work", kctx, "kbase_mmu_page_fault_worker");
 #endif /* CONFIG_MALI_MTK_KBASE_THREAD_DEBUG */
 			atomic_inc(&kbdev->faults_pending);
+		}
 	}
 }
 

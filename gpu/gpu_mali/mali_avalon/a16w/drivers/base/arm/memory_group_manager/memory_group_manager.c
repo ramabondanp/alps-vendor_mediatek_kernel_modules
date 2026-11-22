@@ -816,7 +816,7 @@ static unsigned long mtk_mgm_pool_reclaim_count_objects_local(size_t nr_rank, si
 {
 	unsigned long ret;
 	if (nr_rank > target) {
-		ret = ((nr_rank - target) >> 1);
+		ret = (nr_rank - target);
 	} else
 		ret = nr_rank >> 3;
 
@@ -844,6 +844,9 @@ static unsigned long mtk_mgm_pool_reclaim_count_objects(struct shrinker *s,
 
 	ret += mtk_mgm_pool_reclaim_count_objects_local(data->nr_rank[1][0] << LP_ORDER, data->szRefillTarget);
 	ret += mtk_mgm_pool_reclaim_count_objects_local(data->nr_rank[1][1] << LP_ORDER, data->szRefillTarget);
+
+	dev_dbg(data->dev, "mGMM pool{%zu,%zu,%zu,%zu}: ret %zu\n",
+		data->nr_rank[0][0], data->nr_rank[0][1], data->nr_rank[1][0], data->nr_rank[1][1], ret);
 
 	return ret;
 }
@@ -885,7 +888,8 @@ static unsigned long mtk_mgm_pool_reclaim_scan_objects(struct shrinker *s,
 			break;
 	}
 
-	dev_dbg(data->dev, "mGMM pool[0]: reclaimed %zu (rank0:%zu, rank1:%zu)\n", j+i, j ,i);
+	dev_dbg(data->dev, "mGMM pool[0]{%zu,%zu}: reclaimed %zu (rank0:%zu, rank1:%zu)\n",
+		data->nr_rank[0][0], data->nr_rank[0][1], j+i, j, i);
 
 	target = mtk_mgm_pool_reclaim_count_objects_local(data->nr_rank[1][0] << LP_ORDER, data->szRefillTarget) >> LP_ORDER;
 	for (i = 0; i < target; i++){
@@ -908,7 +912,8 @@ static unsigned long mtk_mgm_pool_reclaim_scan_objects(struct shrinker *s,
 			break;
 	}
 
-	dev_dbg(data->dev, "mGMM pool[1]: reclaimed %zu (rank0:%zu, rank1:%zu)\n", j+i, j ,i);
+	dev_dbg(data->dev, "mGMM pool[1]{%zu,%zu}: reclaimed %zu (rank0:%zu, rank1:%zu)\n",
+		data->nr_rank[1][0], data->nr_rank[1][1], j+i, j, i);
 
 	return ret;
 }

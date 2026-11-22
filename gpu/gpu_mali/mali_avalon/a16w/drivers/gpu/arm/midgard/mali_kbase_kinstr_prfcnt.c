@@ -1421,7 +1421,6 @@ static void kbasep_kinstr_prfcnt_dump_worker(struct work_struct *work)
 	}
 
 	kbasep_kinstr_prfcnt_reschedule_worker(kinstr_ctx);
-
 	mutex_unlock(&kinstr_ctx->lock);
 }
 
@@ -2561,3 +2560,4 @@ void MTK_update_gpu_LTR(void)
 #endif
 }
 #endif /* CONFIG_MALI_MTK_GPU_PMU */
+

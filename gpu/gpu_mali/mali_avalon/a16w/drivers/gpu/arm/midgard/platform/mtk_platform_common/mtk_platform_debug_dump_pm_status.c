@@ -93,12 +93,22 @@ void mtk_debug_dump_pm_status(struct kbase_device *kbdev)
 			 kbdev->pm.backend.l2_desired,
 			 kbdev->pm.backend.l2_always_on);
 	pm_status_print(kbdev,
+		"[PM] l2_force_off_after_mcu_halt=%d policy_change_clamp_state_to_off=%d gpu_wakeup_override=%d runtime_suspend_abort_reason=%d\n",
+			 kbdev->pm.backend.l2_force_off_after_mcu_halt,
+			 kbdev->pm.backend.policy_change_clamp_state_to_off,
+			 kbdev->pm.backend.gpu_wakeup_override,
+			 kbdev->pm.backend.runtime_suspend_abort_reason);
+	pm_status_print(kbdev,
 		"[PM] hwcnt_desired=%d hwcnt_disabled=%d poweroff_wait_in_progress=%d invoke_poweroff_wait_wq_when_l2_off=%d poweron_required=%d\n",
 			 kbdev->pm.backend.hwcnt_desired,
 			 kbdev->pm.backend.hwcnt_disabled,
 			 kbdev->pm.backend.poweroff_wait_in_progress,
 			 kbdev->pm.backend.invoke_poweroff_wait_wq_when_l2_off,
 			 kbdev->pm.backend.poweron_required);
+	pm_status_print(kbdev,
+		"[PM] pm.suspending=%d pm_sched_flags=%d\n",
+			 kbase_pm_is_suspending(kbdev),
+			 kbdev->pm.backend.csf_pm_sched_flags);
 #else /* CONFIG_MALI_CSF_SUPPORT */
 	pm_status_print(kbdev,
 		"[PM] in_reset=%d reset_done=%d gpu_powered=%d gpu_ready=%d shaders_state=%s l2_state=%s shaders_desired=%d l2_desired=%d l2_always_on=%d",

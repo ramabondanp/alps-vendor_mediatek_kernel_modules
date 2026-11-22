@@ -2401,6 +2401,10 @@ static void kcpu_fence_timeout_dump(struct kbase_kcpu_command_queue *queue,
 #if IS_ENABLED(CONFIG_MALI_MTK_FENCE_TIMEOUT_RESET)
 		if (fence_signal_command_timeout_counter == 3) {
 			if (kbase_prepare_to_reset_gpu(kctx->kbdev, RESET_FLAGS_NONE)) {
+#if IS_ENABLED(CONFIG_MALI_MTK_WHITEBOX_FORCE_TERMINATE_CSG)
+				if (mtk_common_check_if_need_force_terminate_csg(kctx->kbdev))
+					mtk_common_whitebox_force_terminate_csg_enable_set(1);
+#endif /* CONFIG_MALI_MTK_WHITEBOX_FORCE_TERMINATE_CSG */
 #if IS_ENABLED(CONFIG_MALI_MTK_LOG_BUFFER)
 				mtk_logbuffer_type_print(kctx->kbdev, MTK_LOGBUFFER_TYPE_CRITICAL | MTK_LOGBUFFER_TYPE_EXCEPTION | MTK_LOGBUFFER_TYPE_DEFERRED,
 					"KCPU queue command timeouts(%d ms)! Trigger GPU reset\n",

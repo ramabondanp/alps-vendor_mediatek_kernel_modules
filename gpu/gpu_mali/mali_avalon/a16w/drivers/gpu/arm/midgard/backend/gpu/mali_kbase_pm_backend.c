@@ -962,7 +962,7 @@ void kbase_pm_handle_gpu_lost(struct kbase_device *kbdev)
 		/* Scheduler reset happens outside of spinlock due to the mutex it acquires */
 		kbase_csf_scheduler_reset(kbdev, true);
 		kbase_csf_scheduler_lock(kbdev);
-		kbase_csf_scheduler_pm_suspend_no_lock(kbdev);
+		kbase_csf_scheduler_pm_suspend_no_lock(kbdev, false);
 		kbase_csf_scheduler_unlock(kbdev);
 		mutex_lock(&arb_vm_state->vm_state_lock);
 
@@ -1004,7 +1004,7 @@ int kbase_pm_force_mcu_wakeup_after_sleep(struct kbase_device *kbdev)
  * @wake_up_sched: Whether the scheduler should be woken up after a successful
  *                 suspension
  *
- * Return 0 on success, negative value otherwise.
+ * Return: 0 on success, negative value otherwise.
  */
 static int pm_handle_mcu_sleep_on_runtime_suspend(struct kbase_device *kbdev, bool *wake_up_sched)
 {
@@ -1061,7 +1061,7 @@ static int pm_handle_mcu_sleep_on_runtime_suspend(struct kbase_device *kbdev, bo
 	 * became active (or active then idle) meanwhile.
 	 */
 	if (atomic_read(&kbdev->pm.active_count) || kbdev->pm.backend.poweroff_wait_in_progress ||
-	    ret) {
+	    ret || atomic_read(&kbdev->faults_pending)) {
 		dev_dbg(kbdev->dev,
 			"Device became active on runtime suspend after suspending Scheduler");
 		suspension_aborted = true;
@@ -1092,6 +1092,11 @@ static int pm_handle_mcu_sleep_on_runtime_suspend(struct kbase_device *kbdev, bo
 			/* The suspend of CSGs failed,
 			 * trigger the GPU reset to be in a deterministic state.
 			 */
+#if IS_ENABLED(CONFIG_MALI_MTK_LOG_BUFFER)
+			dev_warn(kbdev->dev, "Suspend CSG failed on sleep_on_runtime_suspend!");
+			mtk_logbuffer_type_print(kbdev, MTK_LOGBUFFER_TYPE_CRITICAL | MTK_LOGBUFFER_TYPE_EXCEPTION,
+				"Suspend CSG failed on sleep_on_runtime_suspend!\n");
+#endif /* CONFIG_MALI_MTK_LOG_BUFFER */
 			if (kbase_prepare_to_reset_gpu(kbdev, RESET_FLAGS_NONE))
 				kbase_reset_gpu(kbdev);
 
@@ -1114,7 +1119,7 @@ static int pm_handle_mcu_sleep_on_runtime_suspend(struct kbase_device *kbdev, bo
  * @wake_up_sched: Whether the scheduler should be woken up after a successful
  *                 suspension
  *
- * Return 0 on success, negative value otherwise.
+ * Return: 0 on success, negative value otherwise.
  */
 static int pm_handle_mcu_off_on_runtime_suspend(struct kbase_device *kbdev, bool *wake_up_sched)
 {
@@ -1143,6 +1148,11 @@ static int pm_handle_mcu_off_on_runtime_suspend(struct kbase_device *kbdev, bool
 		/* The suspend of CSGs failed,
 		 * trigger the GPU reset to be in a deterministic state.
 		 */
+#if IS_ENABLED(CONFIG_MALI_MTK_LOG_BUFFER)
+		dev_warn(kbdev->dev, "Suspend CSG failed on off_on_runtime_suspend!");
+		mtk_logbuffer_type_print(kbdev, MTK_LOGBUFFER_TYPE_CRITICAL | MTK_LOGBUFFER_TYPE_EXCEPTION,
+				"Suspend CSG failed on off_on_runtime_suspend!\n");
+#endif /* CONFIG_MALI_MTK_LOG_BUFFER */
 		if (kbase_prepare_to_reset_gpu(kbdev, RESET_FLAGS_NONE))
 			kbase_reset_gpu(kbdev);
 

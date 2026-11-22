@@ -812,6 +812,7 @@ int kbase_arbiter_pm_ctx_active_handle_suspend(struct kbase_device *kbdev,
 					res = 1;
 				break;
 			case KBASE_PM_SUSPEND_HANDLER_VM_GPU_GRANTED:
+				/* Unconditionally increment the active_count in this case. */
 				fallthrough;
 			case KBASE_PM_SUSPEND_HANDLER_ALWAYS_INCREASE:
 				break;

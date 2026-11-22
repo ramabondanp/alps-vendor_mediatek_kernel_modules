@@ -602,13 +602,12 @@ kbase_csf_reset_gpu_once(struct kbase_device *kbdev, bool firmware_inited, bool 
 	kbase_pm_reset_complete(kbdev);
 	/* Synchronously wait for the reload of firmware to complete */
 	err = kbase_pm_wait_for_desired_state(kbdev);
-	mutex_unlock(&kbdev->pm.lock);
 
 	if (err) {
 		spin_lock_irqsave(&kbdev->hwaccess_lock, flags);
-		if (!kbase_pm_l2_is_in_desired_state(kbdev))
+		if (!kbase_pm_l2_is_in_desired_state_locked(kbdev))
 			ret = L2_ON_FAILED;
-		else if (!kbase_pm_mcu_is_in_desired_state(kbdev))
+		else if (!kbase_pm_mcu_is_in_desired_state_locked(kbdev))
 			ret = MCU_REINIT_FAILED;
 		spin_unlock_irqrestore(&kbdev->hwaccess_lock, flags);
 #if IS_ENABLED(CONFIG_MALI_MTK_DEBUG_DUMP)
@@ -620,6 +619,8 @@ kbase_csf_reset_gpu_once(struct kbase_device *kbdev, bool firmware_inited, bool 
 		mtk_common_debug(MTK_COMMON_DBG_DUMP_INFRA_STATUS, NULL, MTK_DBG_HOOK_FWRELOAD_FAIL);
 #endif /* CONFIG_MALI_MTK_DEBUG_DUMP */
 	}
+
+	mutex_unlock(&kbdev->pm.lock);
 
 	return ret;
 }
@@ -779,7 +780,7 @@ static void kbase_csf_reset_gpu_worker(struct work_struct *data)
 		 * No pm active reference is taken here since GPU is in sleep
 		 * state and both runtime & system suspend synchronize with the
 		 * GPU reset before they wake up the GPU to suspend on-slot
-		 * groups. GPUCORE-29850 would add the proper handling.
+		 * groups.
 		 */
 		kbase_pm_lock(kbdev);
 #if IS_ENABLED(CONFIG_MALI_MTK_LOG_BUFFER)

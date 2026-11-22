@@ -158,6 +158,10 @@
 #include <gpu_pdma.h>
 #endif /* CONFIG_MALI_MTK_SLC_DYNAMIC_POLICY_V2 */
 
+#if IS_ENABLED(CONFIG_MALI_MTK_WORKER_TOO_LONG_DEBUG)
+#include <mali_kbase_config_defaults.h>
+#endif /* CONFIG_MALI_MTK_WORKER_TOO_LONG_DEBUG */
+
 #define KERNEL_SIDE_DDK_VERSION_STRING "K:" MALI_RELEASE_NAME "(GPL)"
 
 /**
@@ -376,7 +380,12 @@ static struct kbase_context *kbase_file_get_kctx_if_setup_complete(struct kbase_
 static void kbase_file_delete(struct kbase_file *const kfile)
 {
 	struct kbase_device *kbdev = NULL;
-
+#if IS_ENABLED(CONFIG_MALI_MTK_WORKER_TOO_LONG_DEBUG)
+	s64 execute_time = 0;
+	u32 kctx_id = 0;
+	pid_t kctx_tgid = 0;
+	ktime_t begin_timestamp = ktime_get();
+#endif /* kbase_file_delete */
 	if (WARN_ON(!kfile))
 		return;
 
@@ -391,7 +400,27 @@ static void kbase_file_delete(struct kbase_file *const kfile)
 #endif
 		kbase_context_debugfs_term(kctx);
 
+#if IS_ENABLED(CONFIG_MALI_MTK_WORKER_TOO_LONG_DEBUG)
+		begin_timestamp = ktime_get();
+		if (likely(kctx)) {
+			kctx_tgid = kctx->tgid;
+			kctx_id = kctx->id;
+		}
+#endif /* kbase_file_delete */
 		kbase_destroy_context(kctx);
+#if IS_ENABLED(CONFIG_MALI_MTK_WORKER_TOO_LONG_DEBUG)
+		execute_time = ktime_to_ms(ktime_sub(ktime_get(), begin_timestamp));
+		if (execute_time >= KBASE_FUNCTION_EXECUTE_DEBUG_TIMEOUT) {
+			dev_warn(kbdev->dev, "ctx:%d_%d kbase_release monitor (%llums)", kctx_tgid, kctx_id, execute_time);
+#if IS_ENABLED(CONFIG_MALI_MTK_LOG_BUFFER)
+			// dump critical msg when kbase release execution time > 1s
+			if (execute_time >= 1000) {
+				mtk_logbuffer_type_print(kbdev, MTK_LOGBUFFER_TYPE_CRITICAL | MTK_LOGBUFFER_TYPE_EXCEPTION,
+					"ctx:%d_%d kbase_release too long! (%llums)\n", kctx_tgid, kctx_id, execute_time);
+			}
+#endif /* CONFIG_MALI_MTK_LOG_BUFFER */
+		}
+#endif /* kbase_file_delete */
 
 		dev_dbg(kbdev->dev, "deleted base context\n");
 	}
@@ -5435,6 +5464,9 @@ static ssize_t mcu_shader_pwroff_timeout_store(struct device *dev, struct device
 {
 	struct kbase_device *kbdev = dev_get_drvdata(dev);
 	u32 dur_us;
+#if IS_ENABLED(CONFIG_GPU_MT6895)
+	unsigned long flags;
+#endif /* CONFIG_GPU_MT6895 */
 
 	const struct kbase_pm_policy *current_policy;
 	bool always_on;
@@ -5455,8 +5487,13 @@ static ssize_t mcu_shader_pwroff_timeout_store(struct device *dev, struct device
 	/* In sysFs, The unit of the input value of mcu_shader_pwroff_timeout is us.
 	 * But the unit of the input parameter of this function is ns, so multiply by 1000
 	 */
+#if IS_ENABLED(CONFIG_GPU_MT6895)
+	spin_lock_irqsave(&kbdev->hwaccess_lock, flags);
+#endif /* CONFIG_GPU_MT6895 */
 	kbase_csf_firmware_set_mcu_core_pwroff_time(kbdev, (u64)dur_us * NSEC_PER_USEC);
-
+#if IS_ENABLED(CONFIG_GPU_MT6895)
+	spin_unlock_irqrestore(&kbdev->hwaccess_lock, flags);
+#endif /* CONFIG_GPU_MT6895 */
 	return (ssize_t)count;
 }
 

@@ -1813,7 +1813,7 @@ static void set_shader_poweroff_timer(struct kbase_csf_fw_io *fw_io)
 	else
 		pwroff_reg = kbdev->csf.mcu_core_pwroff_dur_count;
 
-	#if IS_ENABLED(CONFIG_MALI_MTK_WHITEBOX_MISSING_DOORBELL)
+#if IS_ENABLED(CONFIG_MALI_MTK_WHITEBOX_MISSING_DOORBELL)
 	if (mtk_common_whitebox_missing_doorbell_enable())
 		kbase_csf_db_valid_push_event(DOORBELL_GLB_CFG_PWROFF_TIMER);
 #endif /* CONFIG_MALI_MTK_WHITEBOX_MISSING_DOORBELL */
@@ -2226,9 +2226,9 @@ static int global_init_on_boot(struct kbase_device *const kbdev)
 		kbdev->pm.backend.hwcnt_disabled = false;
 		kbdev->pm.backend.hwcnt_desired = true;
 	}
-
 	global_init(kbdev, core_mask);
 	kbase_pm_ca_set_core_mask(kbdev, PM_CA_COREMASK_TYPE_REWRITE, 0x0);
+
 	spin_unlock_irqrestore(&kbdev->hwaccess_lock, flags);
 
 	ret = wait_for_global_request(&kbdev->csf.fw_io, request_mask);
@@ -2753,12 +2753,19 @@ u32 kbase_csf_firmware_set_mcu_core_pwroff_time(struct kbase_device *kbdev, u64 
 	u32 no_modifier = 0;
 
 	const u32 pwroff = convert_dur_to_core_pwroff_count(kbdev, dur_ns, &no_modifier);
-
+#if IS_ENABLED(CONFIG_GPU_MT6895)
+	lockdep_assert_held(&kbdev->hwaccess_lock);
+#else
 	spin_lock_irqsave(&kbdev->hwaccess_lock, flags);
+#endif /* CONFIG_GPU_MT6895 */
+
 	kbdev->csf.mcu_core_pwroff_dur_ns = dur_ns;
 	kbdev->csf.mcu_core_pwroff_dur_count = pwroff;
 	kbdev->csf.mcu_core_pwroff_dur_count_no_modifier = no_modifier;
+
+#if !IS_ENABLED(CONFIG_GPU_MT6895)
 	spin_unlock_irqrestore(&kbdev->hwaccess_lock, flags);
+#endif /* CONFIG_GPU_MT6895 */
 
 	dev_dbg(kbdev->dev, "MCU shader Core Poweroff input update: 0x%.8x", pwroff);
 
@@ -4006,7 +4013,7 @@ void kbase_csf_firmware_soi_update(struct kbase_device *kbdev)
 	 * updated safely without racing with any ongoing or future GPU idle
 	 * events.
 	 */
-	if (kbase_csf_scheduler_pm_suspend_no_lock(kbdev)) {
+	if (kbase_csf_scheduler_pm_suspend_no_lock(kbdev, true)) {
 		dev_warn(
 			kbdev->dev,
 			"Failed to suspend the scheduler, FW Sleep-on-Idle config remains unchanged");
@@ -4092,7 +4099,8 @@ int kbase_csf_firmware_soi_disable_on_scheduler_suspend(struct kbase_device *kbd
 
 	lockdep_assert_held(&scheduler->lock);
 
-	if (!atomic_read(&kbdev->csf.scheduler.fw_soi_enabled))
+	if (!atomic_read(&kbdev->csf.scheduler.fw_soi_enabled) ||
+	    (kbdev->pm.backend.mcu_state == KBASE_MCU_IN_SLEEP))
 		return 0;
 
 	kbase_csf_scheduler_spin_lock(kbdev, &flags);

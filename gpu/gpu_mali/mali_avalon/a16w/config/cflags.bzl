@@ -74,6 +74,7 @@ CFLAGS_CORESIGHT = [
 COPTS_KBASE = [
     "MALI_COVERAGE=0",
     "MALI_JIT_PRESSURE_LIMIT_BASE=0",
+    "MALI_RELEASE_NAME=\"r54p1-11eac0\"",
 ] + select({
     "//vendor/mediatek/kernel_modules/gpu/gpu_mali/mali_avalon/a16w/config:mali_debug": ["MALI_UNIT_TEST=1"],
     "//conditions:default": ["MALI_UNIT_TEST=0"],
@@ -83,29 +84,6 @@ COPTS_KBASE = [
 }) + select({
     "//vendor/mediatek/kernel_modules/gpu/gpu_mali/mali_avalon/a16w/config:mali_debug_kutf": ["MALI_KERNEL_TEST_API=1"],
     "//conditions:default": ["MALI_KERNEL_TEST_API=0"],
-}) + select({
-    "//conditions:default": [
-        "CONFIG_MALI_PLATFORM_NAME=\"devicetree\"",
-    ],
-    "//vendor/mediatek/kernel_modules/gpu/gpu_mali/mali_avalon/a16w/config:mali_platform_name_meson": [
-        "CONFIG_MALI_PLATFORM_NAME=\"meson\"",
-    ],
-    "//vendor/mediatek/kernel_modules/gpu/gpu_mali/mali_avalon/a16w/config:mali_platform_name_vexpress": [
-        "CONFIG_MALI_PLATFORM_NAME=\"vexpress\"",
-    ],
-    "//vendor/mediatek/kernel_modules/gpu/gpu_mali/mali_avalon/a16w/config:mali_platform_name_vexpress_1xv7_a57": [
-        "CONFIG_MALI_PLATFORM_NAME=\"vexpress_1xv7_a57\"",
-    ],
-    "//vendor/mediatek/kernel_modules/gpu/gpu_mali/mali_avalon/a16w/config:mali_platform_name_vexpress_6xvirtex7_10mhz": [
-        "CONFIG_MALI_PLATFORM_NAME=\"vexpress_6xvirtex7_10mhz\"",
-    ],
-}) + select({
-    "//conditions:default": [
-        "MALI_RELEASE_NAME=\"r54p1-08bet0\"",
-    ],
-    "//vendor/mediatek/kernel_modules/gpu/gpu_mali/mali_avalon/a16w/config:mali_release_name_r54p1-08bet0": [
-        "MALI_RELEASE_NAME=\"r54p1-08bet0\"",
-    ],
 })
 
 COPTS_MTK = [

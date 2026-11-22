@@ -54,7 +54,7 @@ filegroup(
         select({
             "//vendor/mediatek/kernel_modules/gpu/gpu_mali/mali_avalon/a16w/config:mali_coresight": [":coresight.fragment"],
             "//conditions:default": [":nocoresight.fragment"],
-        })
+        }),
 )
 
 genrule(
@@ -101,6 +101,13 @@ filegroup(
            }) +
            select({
                "//vendor/mediatek/kernel_modules/gpu/gpu_mali/mali_avalon/a16w/config:mali_coresight": ["coresight.fragment"],
+               "//conditions:default": [],
+           }) +
+           select({
+               "//vendor/mediatek/kernel_modules/gpu/gpu_mali/mali_avalon/a16w/config:mali_platform_name_meson": ["platform/meson.fragment"],
+               "//vendor/mediatek/kernel_modules/gpu/gpu_mali/mali_avalon/a16w/config:mali_platform_name_vexpress": ["platform/vexpress.fragment"],
+               "//vendor/mediatek/kernel_modules/gpu/gpu_mali/mali_avalon/a16w/config:mali_platform_name_vexpress_1xv7_a57": ["platform/vexpress_1xv7_a57.fragment"],
+               "//vendor/mediatek/kernel_modules/gpu/gpu_mali/mali_avalon/a16w/config:mali_platform_name_vexpress_6xvirtex7_10mhz": ["platform/vexpress_6xvirtex7_10mhz.fragment"],
                "//conditions:default": [],
            }),
 )

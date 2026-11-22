@@ -1036,9 +1036,9 @@ void kbase_mmu_page_fault_worker(struct work_struct *data)
 		return;
 	}
 
-	#if IS_ENABLED(CONFIG_MALI_MTK_KBASE_THREAD_DEBUG)
+#if IS_ENABLED(CONFIG_MALI_MTK_KBASE_THREAD_DEBUG)
 	MALI_KTHREAD_WORK_START(kctx, "kbase_mmu_page_fault_worker");
-	#endif /* CONFIG_MALI_MTK_KBASE_THREAD_DEBUG */
+#endif /* CONFIG_MALI_MTK_KBASE_THREAD_DEBUG */
 
 #if IS_ENABLED(CONFIG_MALI_MTK_KBASE_TRACE_DEBUG)
 	char msg[256];

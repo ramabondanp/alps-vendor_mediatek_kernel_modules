@@ -101,7 +101,11 @@ enum kbase_pm_suspend_handler {
 	 * Active count should always start at 0 in this case.
 	 */
 	KBASE_PM_SUSPEND_HANDLER_VM_GPU_GRANTED,
-	/** Always increase the active count */
+	/** Always increase the active count. This is used primarily to restore
+	 * its value in case of an earlier unsuccessful power down. Powering
+	 * down could fail if the GPU is still in use, we must ensure that the
+	 * counter's value is restored as part of a full reversal.
+	 */
 	KBASE_PM_SUSPEND_HANDLER_ALWAYS_INCREASE
 };
 

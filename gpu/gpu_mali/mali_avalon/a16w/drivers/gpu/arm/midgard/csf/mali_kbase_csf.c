@@ -1372,6 +1372,7 @@ static int create_queue_group(struct kbase_context *const kctx,
 	group->neural_mask = create->in.neural_mask;
 	group->comp_pri_threshold = create->in.comp_pri_threshold;
 	group->comp_pri_ratio = create->in.comp_pri_ratio;
+	group->fragment_endpoint_task_limit = create->in.fragment_endpoint_task_limit;
 
 #if IS_ENABLED(CONFIG_DEBUG_FS)
 	group->deschedule_deferred_cnt = 0;
@@ -3701,13 +3702,12 @@ static int process_prfcnt_interrupts(struct kbase_device *kbdev, u32 glb_req, u3
 	/* Process PRFCNT_OVERFLOW interrupt. */
 	if ((glb_req ^ glb_ack) & GLB_REQ_PRFCNT_OVERFLOW_MASK) {
 		dev_dbg(kbdev->dev, "PRFCNT_OVERFLOW interrupt received.");
+		kbase_hwcnt_backend_csf_on_prfcnt_overflow(&kbdev->hwcnt_gpu_iface);
 		if (kbase_csf_fw_io_open(fw_io, &fw_io_flags)) {
 			dev_dbg(kbdev->dev,
 				"Skipping PRFCNT_OVERFLOW interrupt handling due to unresponsive MCU.");
 			return -ENODEV;
 		}
-
-		kbase_hwcnt_backend_csf_on_prfcnt_overflow(&kbdev->hwcnt_gpu_iface);
 
 		/* Set the GLB_REQ.PRFCNT_OVERFLOW flag back to
 		 * the same value as GLB_ACK.PRFCNT_OVERFLOW
@@ -3812,6 +3812,11 @@ static inline int process_protm_exit(struct kbase_device *kbdev, u32 glb_ack)
 	if (likely(scheduler->active_protm_grp)) {
 		KBASE_KTRACE_ADD_CSF_GRP(kbdev, SCHEDULER_PROTM_EXIT, scheduler->active_protm_grp,
 					 0u);
+#if IS_ENABLED(CONFIG_GPU_MT6895)
+		scheduler->apply_pmode_exit_wa = true;
+		queue_work(system_highpri_wq,
+				&scheduler->pmode_exit_wa_work);
+#endif /* CONFIG_GPU_MT6895 */
 		scheduler->active_protm_grp = NULL;
 	} else {
 		dev_warn(kbdev->dev, "PROTM_EXIT interrupt after no pmode group");

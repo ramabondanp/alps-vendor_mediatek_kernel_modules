@@ -1561,6 +1561,7 @@ struct tagged_addr *kbase_alloc_phy_pages_helper_locked(struct kbase_mem_phy_all
 	 * to satisfy the memory allocation request.
 	 */
 	size_t nr_pages_to_account = 0;
+	struct kbase_mem_pool *temp_pool;
 
 	KBASE_DEBUG_ASSERT(alloc->type == KBASE_MEM_TYPE_NATIVE);
 	KBASE_DEBUG_ASSERT(alloc->imported.native.kctx);
@@ -1778,8 +1779,12 @@ static size_t free_partial(struct kbase_context *kctx, struct tagged_addr tp, bo
 	spin_lock(&kctx->mem_partials_lock);
 	clear_bit(p - head_page, sa->sub_pages);
 	if (bitmap_empty(sa->sub_pages, NUM_PAGES_IN_2MB_LARGE_PAGE)) {
+		struct kbase_mem_pool *pool = &kctx->mem_pools.large[sa->group_id];
+
 		list_del(&sa->link);
-		kbase_mem_pool_free(&kctx->mem_pools.large[sa->group_id], head_page, false);
+		kbase_mem_pool_lock(pool);
+		kbase_mem_pool_free_locked(pool, head_page, false);
+		kbase_mem_pool_unlock(pool);
 		kfree(sa);
 		nr_pages_to_account = NUM_PAGES_IN_2MB_LARGE_PAGE;
 	} else if (bitmap_weight(sa->sub_pages, NUM_PAGES_IN_2MB_LARGE_PAGE) ==
@@ -1842,8 +1847,7 @@ int kbase_free_phy_pages_helper(struct kbase_mem_phy_alloc *alloc, size_t nr_pag
 			freed += NUM_PAGES_IN_2MB_LARGE_PAGE;
 			nr_pages_to_account += NUM_PAGES_IN_2MB_LARGE_PAGE;
 		} else if (is_partial(*start_free)) {
-			nr_pages_to_account +=
-				free_partial(kctx, *start_free, syncback);
+			nr_pages_to_account += free_partial(kctx, *start_free, syncback);
 			nr_pages_to_free--;
 			start_free++;
 			freed++;
@@ -2054,6 +2058,12 @@ void kbase_mem_kref_free(struct kref *kref)
 #endif
 			kbase_remove_dma_buf_usage(alloc->imported.umm.kctx, alloc);
 		}
+		/* Check if delegation of free is required. On true, return directly. The
+		 * alloc will be freed by the deferral-control later when the deferral end
+		 * condition is satisfied.
+		 */
+		if (kbase_csf_scheduler_delegate_imported_buf_alloc_free(alloc))
+			return;
 		dma_buf_detach(alloc->imported.umm.dma_buf, alloc->imported.umm.dma_attachment);
 		dma_buf_put(alloc->imported.umm.dma_buf);
 		break;
@@ -2062,6 +2072,13 @@ void kbase_mem_kref_free(struct kref *kref)
 		case KBASE_USER_BUF_STATE_PINNED:
 		case KBASE_USER_BUF_STATE_DMA_MAPPED:
 		case KBASE_USER_BUF_STATE_GPU_MAPPED: {
+			/* Check if delegation of free is required. On true, return directly. The
+			 * alloc will be freed by the deferral-control later when the deferral end
+			 * condition is satisfied.
+			 */
+			if (kbase_csf_scheduler_delegate_imported_buf_alloc_free(alloc))
+				return;
+
 			/* It's too late to undo all of the operations that might have been
 			 * done on an imported USER_BUFFER handle, as references have been
 			 * lost already.

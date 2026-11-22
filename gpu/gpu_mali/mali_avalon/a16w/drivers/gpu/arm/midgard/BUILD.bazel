@@ -41,6 +41,14 @@ filegroup(
     ]),
 )
 
+genrule(
+    name = "remove_mali_kconfig_ext_prefix",
+    srcs = ["Kconfig"],
+    outs = ["post_process.kconfig"],
+    cmd = "sed -e '/MALI_KCONFIG_EXT_PREFIX/d' $(location Kconfig) > $@",
+    visibility = ["//visibility:public"],
+)
+
 ddk_headers(
     name = "mali_kernel_headers",
     hdrs = [
@@ -84,7 +92,7 @@ ddk_headers(
 filegroup(
     name = "midgard_kconfig",
     srcs = [
-        "Kconfig",
+        "post_process.kconfig",
         "MTK_Kconfig",
     ] + select({
         "//vendor/mediatek/kernel_modules/gpu/gpu_mali/mali_avalon/a16w/config:mali_debug_kutf": ["//drivers/gpu/arm/midgard/tests:kutf_kconfig"],
@@ -116,11 +124,10 @@ platforms = [
             "mali_kbase_fpga_sysctl.c",
         ],
     ) + glob(
-        ["arbiter/*.c"],
-        exclude = [
-            "arbiter/mali_kbase_aw.c",
-            "arbiter/backend/mali_kbase_aw_backend_csf.c",
-        ],
+       [
+           "arbiter/*.c",
+           "arbiter/backend/*.c",
+       ],
     ) + glob(
         ["backend/gpu/*.c"],
         exclude = [

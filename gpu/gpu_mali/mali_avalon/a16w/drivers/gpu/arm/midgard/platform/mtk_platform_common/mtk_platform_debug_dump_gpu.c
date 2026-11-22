@@ -1237,7 +1237,7 @@ static void mtk_debug_csf_csg_active_dump_queue(pid_t tgid, u32 id,
 
     /* if have command didn't complete print the last command's before and after 4 commands */
     if (cs_insert != cs_extract) {
-        size_t size_mask = (queue->queue_reg->nr_pages << PAGE_SHIFT) - 1;
+        //size_t size_mask = (queue->queue_reg->nr_pages << PAGE_SHIFT) - 1;
         const unsigned int instruction_size = sizeof(u64);
         u64 start, stop, aligned_cs_extract;
         int dump_countdown = 4;     /* 4 * 8 = 32, maximal dump instructions */
@@ -1258,10 +1258,11 @@ static void mtk_debug_csf_csg_active_dump_queue(pid_t tgid, u32 id,
             stop = cs_insert;
 
         mtk_log_critical_exception(queue->kctx->kbdev, true, "Instructions from Extract offset %llx", start);
-
+        mtk_log_critical_exception(queue->kctx->kbdev, true, "page_off %llx offset %llx vmap to gpu_addr %llx", (start % queue->size) >> PAGE_SHIFT, (start % queue->size) & ~PAGE_MASK,
+            queue->base_addr + (start % queue->size));
         while (start != stop && dump_countdown--) {
-            u64 page_off = (start & size_mask) >> PAGE_SHIFT;
-            u64 offset = (start & size_mask) & ~PAGE_MASK;
+            u64 page_off = (start % queue->size) >> PAGE_SHIFT;
+            u64 offset = (start % queue->size) & ~PAGE_MASK;
             struct page *page =
                 as_page(queue->queue_reg->gpu_alloc->pages[page_off]);
             u64 *ringbuffer = vmap(&page, 1, VM_MAP, pgprot_noncached(PAGE_KERNEL));

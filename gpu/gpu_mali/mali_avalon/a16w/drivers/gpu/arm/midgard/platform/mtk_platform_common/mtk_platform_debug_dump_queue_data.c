@@ -79,8 +79,6 @@ static void print_group_queues_data(struct kbase_queue_group *const group)
 		if (!queue->queue_reg || !queue->queue_reg->nr_pages)
 			continue;
 
-		size_mask = (queue->queue_reg->nr_pages << PAGE_SHIFT) - 1;
-
 		if (cs_insert == cs_extract)
 			continue;
 
@@ -100,9 +98,8 @@ static void print_group_queues_data(struct kbase_queue_group *const group)
 		pr_err("\nQueue %u: Instructions from Extract offset %llx\n", i, start);
 
 		while (start != stop) {
-			page_off = (start & size_mask) >> PAGE_SHIFT;
-			offset = (start & size_mask) & ~PAGE_MASK;
-
+			page_off = (start % queue->size) >> PAGE_SHIFT;
+			offset = (start % queue->size) & ~PAGE_MASK;
 			if (!queue->queue_reg->gpu_alloc)
 				break;
 

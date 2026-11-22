@@ -130,9 +130,6 @@ struct kbase_context *kbase_create_context(struct kbase_device *kbdev, bool is_c
 	if (WARN_ON(flags != (flags & BASEP_CONTEXT_CREATE_KERNEL_FLAGS)))
 		return NULL;
 
-	/* zero-inited as lot of code assume it's zero'ed out on create */
-	kctx = vzalloc(sizeof(*kctx));
-
 #if IS_ENABLED(CONFIG_MALI_MTK_CHECK_FATAL_SIGNAL)
 	if (!current) {
 		pr_err("%s:current is NULL", __func__);
@@ -149,6 +146,9 @@ struct kbase_context *kbase_create_context(struct kbase_device *kbdev, bool is_c
 		return NULL;
 	}
 #endif /* CONFIG_MALI_MTK_CHECK_FATAL_SIGNAL */
+
+	/* zero-inited as lot of code assume it's zero'ed out on create */
+	kctx = vzalloc(sizeof(*kctx));
 
 	if (WARN_ON(!kctx))
 		return NULL;

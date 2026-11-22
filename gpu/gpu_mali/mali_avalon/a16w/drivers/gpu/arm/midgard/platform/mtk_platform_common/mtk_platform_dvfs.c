@@ -15,6 +15,7 @@
 #include <mtk_gpufreq.h>
 #include <mtk_gpu_utility.h>
 #include <platform/mtk_platform_common/mtk_platform_dvfs.h>
+#include <ged_dvfs.h>
 
 #if IS_ENABLED(CONFIG_MALI_MIDGARD_DVFS) && \
 	IS_ENABLED(CONFIG_MALI_MTK_DVFS_POLICY) && \
@@ -49,6 +50,8 @@ static unsigned int current_util_mcu;
 #define UTIL_TILER_ID    6
 #define UTIL_SC_COMP_ID  7
 #define UTIL_l2ext_ID    8
+static unsigned long long pre_active_raw;
+static bool counter_unchange;
 #elif IS_ENABLED(CONFIG_MALI_MTK_DVFS_LOADING_MODE)
 #define UTIL_ACTIVE_ID   0
 #define UTIL_TA_ID       1
@@ -56,6 +59,8 @@ static unsigned int current_util_mcu;
 #define UTIL_3D_ID       3
 #define UTIL_ITER_ID     4
 #define UTIL_MCU_ID      5
+static unsigned long long pre_active_raw;
+static bool counter_unchange;
 #endif
 
 #if IS_ENABLED(CONFIG_MALI_MIDGARD_DVFS) && IS_ENABLED(CONFIG_MALI_MTK_DVFS_POLICY)
@@ -108,21 +113,29 @@ void mtk_common_update_gpu_utilization(void)
 
 int mtk_common_get_util_active(void)
 {
+	if (ged_dvfs_get_util_active() >= 0)
+		return counter_unchange ? 0 : ged_dvfs_get_util_active();
 	return current_util_active;
 }
 
 int mtk_common_get_util_3d(void)
 {
+	if (ged_dvfs_get_util_3d() >= 0)
+		return counter_unchange ? 0 : ged_dvfs_get_util_3d();
 	return current_util_3d;
 }
 
 int mtk_common_get_util_ta(void)
 {
+	if (ged_dvfs_get_util_ta() >= 0)
+		return counter_unchange ? 0 : ged_dvfs_get_util_ta();
 	return current_util_ta;
 }
 
 int mtk_common_get_util_compute(void)
 {
+	if (ged_dvfs_get_util_comp() >= 0)
+		return counter_unchange ? 0 : ged_dvfs_get_util_comp();
 	return current_util_compute;
 }
 
@@ -216,6 +229,15 @@ void mtk_common_cal_gpu_utilization(unsigned int *pui32Loading,
 		current_util_iter    = utilisation[4];
 		current_util_mcu     = utilisation[5];
 	}
+
+#if IS_ENABLED(CONFIG_MALI_MTK_DVFS_LOADING_MODE)
+	// check if gpu power off
+	if (pre_active_raw == util_ex->util_active_raw)
+		counter_unchange = true;
+	else
+		counter_unchange = false;
+	pre_active_raw = util_ex->util_active_raw;
+#endif /* CONFIG_MALI_MTK_DVFS_LOADING_MODE */
 }
 
 #if IS_ENABLED(CONFIG_MALI_MIDGARD_DVFS) && \
@@ -311,8 +333,8 @@ static int mtk_dvfs_gpu_utilization_show(struct seq_file *m, void *v)
 #endif /* CONFIG_MTK_GPUFREQ_V2 */
 
 	seq_printf(m, "ACTIVE=%u 3D/TA/COMPUTE=%u/%u/%u OPP_IDX=%u MFG_PWR=%d\n",
-	           current_util_active, current_util_3d, current_util_ta,
-	           current_util_compute, cur_opp_idx, mtk_common_pm_is_mfg_active());
+	           mtk_common_get_util_active(), mtk_common_get_util_3d(), mtk_common_get_util_ta(),
+	           mtk_common_get_util_compute(), cur_opp_idx, mtk_common_pm_is_mfg_active());
 
 	mutex_unlock(&gpu_utilization_lock);
 #else

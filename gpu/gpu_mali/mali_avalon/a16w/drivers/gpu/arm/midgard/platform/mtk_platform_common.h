@@ -107,7 +107,9 @@ bool mtk_common_whitebox_force_hard_reset_enable(void);
 #endif /* CONFIG_MALI_MTK_WHITEBOX_FORCE_HARD_RESET */
 
 #if IS_ENABLED(CONFIG_MALI_MTK_WHITEBOX_FORCE_TERMINATE_CSG)
-bool mtk_common_whitebox_force_terminate_csg_enable(void);
+bool mtk_common_whitebox_force_terminate_csg_enable_get(void);
+void mtk_common_whitebox_force_terminate_csg_enable_set(u32 enable);
+bool mtk_common_check_if_need_force_terminate_csg(struct kbase_device *kbdev);
 #endif /* CONFIG_MALI_MTK_WHITEBOX_FORCE_TERMINATE_CSG */
 
 #if IS_ENABLED(CONFIG_MALI_MTK_WHITEBOX_DIRECTLY_HARD_RESET)
