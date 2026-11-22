@@ -4083,3 +4083,105 @@ int common_parse_ebd_line(struct subdrv_ctx *ctx, struct mtk_recv_sensor_ebd_lin
 
 	return 0;
 }
+
+void i2c_table_cntinuburst_write(struct subdrv_ctx *ctx, u16 *list, u32 len)
+{
+#define MAXLEN_CONTINUEDATA 252
+	char puSdContinCmd[MAXLEN_CONTINUEDATA];
+	u32 continlen = 0, item = 0, nextItem, IDX;
+	u32 continStartItem = 0, continCount = 0;
+	u32 unContinStartItem = 0, unContinCount = 0;
+	u32 continNextAddr = 0, continCurAddr = 0;
+	u32 dataOffset = 2;
+	u8 endflag = 0;
+	u8 lastContinStat = 0, continStat = 0;
+	u16 *pRegSrc, regaddr;
+	u16 tempdata;
+
+	switch (ctx->s_ctx.i2c_transfer_data_type) {
+	case I2C_DT_ADDR_16_DATA_16:
+		dataOffset = 2;
+		break;
+	case I2C_DT_ADDR_16_DATA_8:
+	default:
+		dataOffset = 1;
+		break;
+	}
+	DRV_LOG(ctx, "dataOffset=%d.\n", dataOffset);
+
+	for (item = 0; item < len; item = nextItem) {
+		continCurAddr = list[item];
+		nextItem = item + 2;
+		if (nextItem < len)
+			continNextAddr = list[nextItem];
+		else
+			endflag = 1;
+
+		if (endflag == 0) {
+			if ((continCurAddr + dataOffset) == continNextAddr) {
+				if (continStat != 1) {
+					continCount = 2;
+					continStartItem = item;
+					continStat = 1;
+				}
+				continCount += 2;
+			} else {
+				if (continStat == 0) {
+					unContinCount = 0;
+					unContinStartItem = item;
+					continStat = 2;
+					unContinCount += 2;
+				} else if (continStat == 1) {
+					continStat = 0;
+				} else {
+					unContinCount += 2;
+				}
+			}
+		} else {
+			if (continStat == 2) {
+				unContinCount += 2;
+			} else if (continStat == 0) {
+				unContinCount = 0;
+				unContinStartItem = item;
+				continStat = 2;
+				unContinCount += 2;
+			}
+		}
+
+		if ((lastContinStat != continStat) || endflag == 1) {
+			if ((lastContinStat == 1 && (continStat != 1)) ||
+			    (endflag == 1 && continStat == 1)) {
+				continlen = 0;
+				pRegSrc = list + continStartItem;
+				regaddr = pRegSrc[0];
+				for (IDX = 1; IDX < continCount;) {
+					tempdata = pRegSrc[IDX];
+					if (dataOffset == 2) {
+						puSdContinCmd[continlen++] = (char)(tempdata >> 8);
+						puSdContinCmd[continlen++] = (char)(tempdata & 0xFF);
+					} else {
+						puSdContinCmd[continlen++] = (char)(tempdata & 0xFF);
+					}
+					IDX += 2;
+					if ((continlen >= MAXLEN_CONTINUEDATA) ||
+					    (continCount <= IDX)) {
+						subdrv_i2c_wr_seq_p8(ctx, regaddr,
+								     puSdContinCmd, continlen);
+						continlen = 0;
+						if (continCount > IDX)
+							regaddr = pRegSrc[IDX - 1];
+					}
+				}
+			} else if ((lastContinStat == 2 && (continStat != 2)) ||
+				   (endflag == 1 && continStat == 2)) {
+				pRegSrc = list + unContinStartItem;
+				if (dataOffset == 2)
+					subdrv_i2c_wr_regs_u16(ctx, pRegSrc, unContinCount);
+				else
+					subdrv_i2c_wr_regs_u8(ctx, pRegSrc, unContinCount);
+			}
+			lastContinStat = continStat;
+		}
+	}
+#undef MAXLEN_CONTINUEDATA
+}

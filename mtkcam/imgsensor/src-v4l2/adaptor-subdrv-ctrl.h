@@ -201,4 +201,5 @@ int common_get_csi_param(struct subdrv_ctx *ctx,
 int common_update_sof_cnt(struct subdrv_ctx *ctx, u32 sof_cnt);
 int common_parse_ebd_line(struct subdrv_ctx *ctx, struct mtk_recv_sensor_ebd_line *data,
 	struct mtk_ebd_dump *obj);
+void i2c_table_cntinuburst_write(struct subdrv_ctx *ctx, u16 *list, u32 len);
 #endif
