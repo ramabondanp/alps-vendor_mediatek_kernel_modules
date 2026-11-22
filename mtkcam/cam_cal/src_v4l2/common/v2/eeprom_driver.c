@@ -34,6 +34,7 @@
 #define OF_EEPROM_NAMES_MAXCNT 20
 
 #include "cam_cal_config.h"
+#include "x6871_cam_cal.h"
 
 extern struct STRUCT_CAM_CAL_CONFIG_STRUCT *cam_cal_config_list[];
 extern unsigned short cam_cal_number;
@@ -270,8 +271,19 @@ static long eeprom_ioctl(struct file *a_file, unsigned int a_cmd,
 		}
 		/* debug_log("QUERY\n"); */
 		break;
+	case X6871_CAM_CAL_QUERY:
+		if (!x6871_cam_cal_matches(pdata, pdata->sensor_info.sensor_id)) {
+			kfree(pBuff);
+			return -EPERM;
+		}
+		break;
+	case X6871_CAM_CAL_READ:
 	case CAM_CALIOC_G_GKI_READ:
-		ret = get_cal_data(pdata, (unsigned int *)pBuff);
+		if (a_cmd == X6871_CAM_CAL_READ || x6871_cam_cal_matches(pdata,
+			    ((struct STRUCT_CAM_CAL_DATA_STRUCT *)pBuff)->sensorID))
+			ret = x6871_cam_cal_read(pdata, pBuff);
+		else
+			ret = get_cal_data(pdata, pBuff);
 		if (ret == CAM_CAL_ERR_NO_ERR) {
 			if (copy_to_user((u8 __user *) a_param, (u8 *) pBuff, _IOC_SIZE(a_cmd))) {
 				kfree(pBuff);
@@ -281,7 +293,11 @@ static long eeprom_ioctl(struct file *a_file, unsigned int a_cmd,
 		kfree(pBuff);
 		return ret;
 	case CAM_CALIOC_G_GKI_NEED_POWER_ON:
-		ret = get_is_need_power_on(pdata, (unsigned int *)pBuff);
+		if (x6871_cam_cal_matches(pdata,
+			    ((struct STRUCT_CAM_CAL_NEED_POWER_ON *)pBuff)->sensorID))
+			ret = x6871_cam_cal_need_power(pdata, pBuff);
+		else
+			ret = get_is_need_power_on(pdata, pBuff);
 		if (ret == CAM_CAL_ERR_NO_ERR) {
 			if (copy_to_user((u8 __user *) a_param, (u8 *) pBuff, _IOC_SIZE(a_cmd))) {
 				kfree(pBuff);
@@ -494,4 +510,3 @@ module_i2c_driver(eeprom_i2c_init);
 MODULE_DESCRIPTION("camera eeprom driver");
 MODULE_AUTHOR("Mediatek");
 MODULE_LICENSE("GPL v2");
-
