@@ -37,6 +37,9 @@ struct stCAM_CAL_LIST_STRUCT g_camCalList[] = {
 	{IMX350_SENSOR_ID, 0xA0, Common_read_region},
 	{IMX386_MONO_SENSOR_ID, 0xA0, Common_read_region},
 	{IMX499_SENSOR_ID, 0xA0, Common_read_region},
+	/* Infinix X6871 */
+	{GC32E1_SENSOR_ID, 0xA2, Common_read_region, MAX_EEPROM_SIZE_16K},
+	{S5KHM6SX_SENSOR_ID, 0xA0, Common_read_region, MAX_EEPROM_SIZE_16K},
 	/*  ADD before this line */
 	{0, 0, 0}       /*end of list */
 };

@@ -26,7 +26,8 @@
 
 #include "cam_cal.h"
 
-#define DEV_NODE_NAME_PREFIX "camera-eeprom"
+#define DEV_NODE_NAME_PREFIX "camera_eeprom"
+#define DEV_NODE_NAME_PREFIX_ALT "camera-eeprom"
 #define DEV_NAME_FMT "camera_eeprom%u"
 #define DEV_CLASS_NAME_FMT "camera_eepromdrv%u"
 #define EEPROM_DEVICE_NNUMBER 255
@@ -330,6 +331,12 @@ static inline int retrieve_index(struct i2c_client *client,
 
 	if (strncmp(node_name, DEV_NODE_NAME_PREFIX, prefix_len) == 0 &&
 	    kstrtouint(node_name + prefix_len, 10, index) == 0) {
+		must_log("index = %u\n", *index);
+		return 0;
+	}
+	if (strncmp(node_name, DEV_NODE_NAME_PREFIX_ALT,
+		    strlen(DEV_NODE_NAME_PREFIX_ALT)) == 0 &&
+	    kstrtouint(node_name + strlen(DEV_NODE_NAME_PREFIX_ALT), 10, index) == 0) {
 		must_log("index = %u\n", *index);
 		return 0;
 	}
