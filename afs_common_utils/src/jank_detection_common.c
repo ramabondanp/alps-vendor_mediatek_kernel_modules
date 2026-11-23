@@ -657,9 +657,7 @@ static int __init jank_detection_init(void) {
   fpsgo2jank_detection_register_callback_fp = register_heavy_callback;
   fpsgo2jank_detection_unregister_callback_fp = unregister_heavy_callback;
   
-  hrtimer_init(&timer, CLOCK_MONOTONIC, HRTIMER_MODE_REL);
-  hrtimer_init(&timer_forcepull, CLOCK_MONOTONIC, HRTIMER_MODE_REL);
-  timer.function = timer_callback;
+  hrtimer_setup(&timer, timer_callback, CLOCK_MONOTONIC, HRTIMER_MODE_REL);
   timer_forcepull.function = timer_forcepull_callback;
   kt = ktime_set(0, 2000*1000);
   kt_forcepull = ktime_set(0, 7000*1000);
