@@ -1554,7 +1554,7 @@ void mtk_cam_watchdog_stop(struct mtk_cam_watchdog *wd)
 	if (!atomic_cmpxchg(&wd->started, 1, 0))
 		return;
 
-	del_timer_sync(&wd->timer);
+	timer_delete_sync(&wd->timer);
 
 	atomic_set(&wd->timer_signaled, 1);
 	wake_up_interruptible(&wd->monitor_wq);

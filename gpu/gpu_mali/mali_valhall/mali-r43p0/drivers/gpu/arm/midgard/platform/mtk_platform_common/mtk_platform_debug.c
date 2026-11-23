@@ -2647,7 +2647,7 @@ static void mtk_debug_dump_for_external_fence(int fd, int pid, int type, int tim
 		list_for_each_entry(kctx, &kbdev->kctx_list, kctx_list_link) {
 			mutex_lock(&kctx->jctx.lock);
 
-			del_timer_sync(&kctx->soft_job_timeout);
+			timer_delete_sync(&kctx->soft_job_timeout);
 			list_for_each_safe(entry, tmp, &kctx->waiting_soft_jobs) {
 				katom = list_entry(entry, struct kbase_jd_atom, queue);
 				kbase_cancel_soft_job(katom);

@@ -11935,7 +11935,7 @@ void txPwrCtrlUninit(struct ADAPTER *prAdapter)
 		sizeof(struct SET_COUNTRY_CHANNEL_POWER_LIMIT *)
 		* PWR_LIMIT_RF_BAND_NUM);
 
-	del_timer_sync(&prAdapter->prGlueInfo->rTxPowerLimitTimer);
+	timer_delete_sync(&prAdapter->prGlueInfo->rTxPowerLimitTimer);
 
 #if CFG_ENABLE_WAKE_LOCK
 	/* Make sure wakelock ctrl is not race condition with
@@ -15320,7 +15320,7 @@ bool rlmDomainPwrLmtEmiStatusCtrl(struct ADAPTER *prAdapter,
 			}
 #endif
 			/* stop timer */
-			del_timer(&prGlueInfo->rTxPowerLimitTimer);
+			timer_delete(&prGlueInfo->rTxPowerLimitTimer);
 			prTxpEmiCtrl->i4PwrLmtLockCounter = 0;
 			rlmDomainSendCachePwrLmtData(prAdapter);
 		}

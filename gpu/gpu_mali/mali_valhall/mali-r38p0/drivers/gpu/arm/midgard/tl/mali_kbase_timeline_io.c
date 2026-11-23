@@ -355,7 +355,7 @@ static int kbasep_timeline_io_release(struct inode *inode, struct file *filp)
 
 	/* Stop autoflush timer before releasing access to streams. */
 	atomic_set(&timeline->autoflush_timer_active, 0);
-	del_timer_sync(&timeline->autoflush_timer);
+	timer_delete_sync(&timeline->autoflush_timer);
 
 	atomic_set(timeline->timeline_flags, 0);
 	return 0;

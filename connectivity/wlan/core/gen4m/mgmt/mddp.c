@@ -1748,7 +1748,7 @@ int32_t mddpMdNotifyInfoHandleGenSwitchStart(
 	}
 
 	/* only delete timer for normal case */
-	del_timer_sync(&prHifInfo->rGenSwitch4MddpTimer);
+	timer_delete_sync(&prHifInfo->rGenSwitch4MddpTimer);
 end:
 
 	return 0;
@@ -1787,7 +1787,7 @@ int32_t mddpMdNotifyInfoHandleGenSwitchEnd(
 	prHifInfo->u4GenSwitchState = MDDP_GEN_SWITCH_NORMAL_STATE;
 
 	/* only delete timer for normal case */
-	del_timer_sync(&prHifInfo->rGenSwitch4MddpTimer);
+	timer_delete_sync(&prHifInfo->rGenSwitch4MddpTimer);
 end:
 
 	return 0;
@@ -2231,7 +2231,7 @@ void mddpHandleGenSwitchMdExp(int32_t md_state)
 	}
 	prHifInfo = &prGlueInfo->rHifInfo;
 	if (prHifInfo->u4GenSwitchState == MDDP_GEN_SWITCH_START_BEGIN_STATE) {
-		del_timer_sync(&prHifInfo->rGenSwitch4MddpTimer);
+		timer_delete_sync(&prHifInfo->rGenSwitch4MddpTimer);
 		DBGLOG(HAL, INFO, "mddp gen switch state [%d]->[%d]\n",
 			prHifInfo->u4GenSwitchState,
 			MDDP_GEN_SWITCH_START_END_SKIP_MD_STATE);
@@ -2240,7 +2240,7 @@ void mddpHandleGenSwitchMdExp(int32_t md_state)
 		wlandioStopPcieStatus(prGlueInfo->prAdapter,
 			PCIE_STOP_TRANSITION_END);
 	} else if (prHifInfo->u4GenSwitchState == MDDP_GEN_SWITCH_END_STATE) {
-		del_timer_sync(&prHifInfo->rGenSwitch4MddpTimer);
+		timer_delete_sync(&prHifInfo->rGenSwitch4MddpTimer);
 		DBGLOG(HAL, INFO, "mddp gen switch state [%d]->[%d]\n",
 			prHifInfo->u4GenSwitchState,
 			MDDP_GEN_SWITCH_NORMAL_STATE);

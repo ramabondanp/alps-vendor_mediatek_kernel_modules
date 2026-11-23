@@ -5790,7 +5790,7 @@ u_int8_t kalSetTimer(IN struct GLUE_INFO *prGlueInfo,
 		mod_timer(&prGlueInfo->tickfn,
 			  jiffies + u4Interval * HZ / MSEC_PER_SEC);
 	} else {
-		del_timer_sync(&(prGlueInfo->tickfn));
+		timer_delete_sync(&(prGlueInfo->tickfn));
 
 		prGlueInfo->tickfn.expires = jiffies + u4Interval * HZ /
 					     MSEC_PER_SEC;
@@ -5816,7 +5816,7 @@ u_int8_t kalCancelTimer(IN struct GLUE_INFO *prGlueInfo)
 
 	clear_bit(GLUE_FLAG_TIMEOUT_BIT, &prGlueInfo->ulFlag);
 
-	if (del_timer_sync(&(prGlueInfo->tickfn)) >= 0)
+	if (timer_delete_sync(&(prGlueInfo->tickfn)) >= 0)
 		return TRUE;
 	else
 		return FALSE;
@@ -12841,9 +12841,9 @@ void kalTxDirectUninit(struct GLUE_INFO *prGlueInfo)
 
 	if (HAL_IS_TX_DIRECT(prAdapter)) {
 		if (prAdapter->fgTxDirectInited) {
-			del_timer_sync(&prAdapter->rTxDirectSkbTimer);
-			del_timer_sync(&prAdapter->rTxDirectHifTimer);
-			del_timer_sync(&prAdapter->rTxFwdTimer);
+			timer_delete_sync(&prAdapter->rTxDirectSkbTimer);
+			timer_delete_sync(&prAdapter->rTxDirectHifTimer);
+			timer_delete_sync(&prAdapter->rTxFwdTimer);
 			kalTxDirectClearSkbQ(prGlueInfo);
 		}
 	}

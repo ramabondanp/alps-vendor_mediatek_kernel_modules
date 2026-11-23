@@ -894,7 +894,7 @@ void glClearHifInfo(struct GLUE_INFO *prGlueInfo)
 	struct TX_CMD_REQ *prTxCmdReq;
 	struct TX_DATA_REQ *prTxDataReq;
 
-	del_timer_sync(&prHifInfo->rSerTimer);
+	timer_delete_sync(&prHifInfo->rSerTimer);
 
 	halUninitMsduTokenInfo(prGlueInfo->prAdapter);
 	halWpdmaFreeRing(prGlueInfo);

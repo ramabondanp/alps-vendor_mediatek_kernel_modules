@@ -436,7 +436,7 @@ static void btmtk_sdio_create_fw_own_timer(struct btmtk_sdio_dev *cif_dev)
 
 static void btmtk_sdio_delete_fw_own_timer(struct btmtk_sdio_dev *cif_dev)
 {
-	del_timer_sync(&cif_dev->fw_own_timer);
+	timer_delete_sync(&cif_dev->fw_own_timer);
 	BTMTK_INFO("%s end", __func__);
 }
 

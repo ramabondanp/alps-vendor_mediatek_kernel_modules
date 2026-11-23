@@ -2087,7 +2087,7 @@ void halCancleTxDelayTimer(struct ADAPTER *prAdapter)
 #if CFG_SUPPORT_HRTIMER
 	hrtimer_cancel(&prHifInfo->rTxDelayTimer);
 #else
-	del_timer_sync(&prHifInfo->rTxDelayTimer);
+	timer_delete_sync(&prHifInfo->rTxDelayTimer);
 #endif /* CFG_SUPPORT_HRTIMER */
 	KAL_CLR_BIT(HIF_TX_DATA_DELAY_TIMER_RUNNING_BIT,
 		    prHifInfo->ulTxDataTimeout);
@@ -2468,19 +2468,19 @@ void halHifSwInfoUnInit(struct GLUE_INFO *prGlueInfo)
 	prSwEmiRingInfo = &prBusInfo->rSwEmiRingInfo;
 #endif /* CFG_MTK_WIFI_SW_EMI_RING */
 
-	del_timer_sync(&prHifInfo->rSerTimer);
+	timer_delete_sync(&prHifInfo->rSerTimer);
 	prHifInfo->fgIsTimerStart = FALSE;
 #if (CFG_SUPPORT_TX_DATA_DELAY == 1)
 #if CFG_SUPPORT_HRTIMER
 	hrtimer_cancel(&prHifInfo->rTxDelayTimer);
 #else
-	del_timer_sync(&prHifInfo->rTxDelayTimer);
+	timer_delete_sync(&prHifInfo->rTxDelayTimer);
 #endif /* CFG_SUPPORT_HRTIMER */
 #endif
 
 #if CFG_MTK_MDDP_SUPPORT
 #if (CFG_PCIE_GEN_SWITCH == 1)
-	del_timer_sync(&prHifInfo->rGenSwitch4MddpTimer);
+	timer_delete_sync(&prHifInfo->rGenSwitch4MddpTimer);
 #endif /* CFG_PCIE_GEN_SWITCH */
 #endif /* CFG_MTK_MDDP_SUPPORT */
 
@@ -5553,7 +5553,7 @@ void halHwRecoveryFromError(struct ADAPTER *prAdapter)
 
 	case ERR_RECOV_WAIT_MCU_NORMAL:
 		if (u4Status & ERROR_DETECT_MCU_NORMAL_STATE) {
-			del_timer_sync(&prHifInfo->rSerTimer);
+			timer_delete_sync(&prHifInfo->rSerTimer);
 			prHifInfo->fgIsTimerStart = FALSE;
 #if (CFG_ENABLE_WIFI_DIRECT)
 			/* update Beacon frame if operating in AP mode. */

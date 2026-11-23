@@ -178,7 +178,7 @@ static void cnmTimerStopTimer_impl(IN struct ADAPTER *prAdapter,
 			*  spin_lock_irq(somelock);
 			*                         <IRQ>
 			*                         spin_lock(somelock);
-			*  del_timer_sync(mytimer);
+			*  timer_delete_sync(mytimer);
 			*   while (base->running_timer == mytimer);
 			* ==================================================
 			*/

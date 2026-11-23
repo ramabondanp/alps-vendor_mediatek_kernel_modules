@@ -530,7 +530,7 @@ void c2ps_monitor_init(void)
 void c2ps_monitor_uninit(void)
 {
 	atomic_set(&enable_reg_check_timer, 0);
-	del_timer_sync(&c2ps_reg_check_timer);
+	timer_delete_sync(&c2ps_reg_check_timer);
 	clear_reg_check_task_list();
 	if (proxy_wq) {
 		flush_workqueue(proxy_wq);

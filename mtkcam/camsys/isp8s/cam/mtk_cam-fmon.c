@@ -583,7 +583,7 @@ void mtk_cam_fmon_disable(struct mtk_fmon_device *fmon)
 
 	mutex_unlock(&fmon->op_lock);
 
-	del_timer_sync(&fmon->reset_timer);
+	timer_delete_sync(&fmon->reset_timer);
 	disable_irq(fmon->irq);
 
 	/* cti force stop if start is trigged */

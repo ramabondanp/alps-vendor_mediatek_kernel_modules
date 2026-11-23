@@ -246,9 +246,9 @@ static void c2ps_notifier_uninit(void)
 	reset_eas_setting();
 	c2ps_regulator_flush();
 	c2ps_monitor_uninit();
-	del_timer_sync(&background_info_update_timer);
+	timer_delete_sync(&background_info_update_timer);
 	exit_c2ps_common();
-	del_timer_sync(&self_uninit_timer);
+	timer_delete_sync(&self_uninit_timer);
 	set_wl_manual(-1);
 
 	// reset util margin to default

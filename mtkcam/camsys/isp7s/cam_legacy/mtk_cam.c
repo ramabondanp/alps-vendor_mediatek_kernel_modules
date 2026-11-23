@@ -10493,7 +10493,7 @@ void mtk_ctx_watchdog_stop(struct mtk_cam_ctx *ctx, int pipe_id)
 	spin_unlock_irqrestore(&ctx->watchdog_pipe_lock, flags);
 
 	if (is_timer_delete)
-		del_timer_sync(&ctx->watchdog_timer);
+		timer_delete_sync(&ctx->watchdog_timer);
 }
 
 static void mtk_cam_ctx_init(struct mtk_cam_ctx *ctx,

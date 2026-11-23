@@ -218,7 +218,7 @@ static void seninf_sentest_watchdog_timer_callback(struct timer_list *t)
 
 	ctx->sentest_seamless_ut_status = SENTEST_SEAMLESS_IS_TIMEOUT;
 	ctx->sentest_seamless_ut_en = false;
-	del_timer_sync(&wd->timer);
+	timer_delete_sync(&wd->timer);
 }
 
 int seninf_sentest_watchingdog_en(struct mtk_cam_sentest_watchdog *wd, bool en)
@@ -254,7 +254,7 @@ int seninf_sentest_watchingdog_en(struct mtk_cam_sentest_watchdog *wd, bool en)
 
 	} else {
 		// del timer
-		del_timer_sync(&wd->timer);
+		timer_delete_sync(&wd->timer);
 
 		ctx->sentest_seamless_ut_status = SENTEST_SEAMLESS_IS_IDLE;
 	}

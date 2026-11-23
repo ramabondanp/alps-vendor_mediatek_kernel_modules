@@ -1231,7 +1231,7 @@ static void kbase_csf_fence_wait_callback(struct dma_fence *fence,
 
 #ifdef CONFIG_MALI_FENCE_DEBUG
 	/* Fence gets signaled. Deactivate the timer for fence-wait timeout */
-	del_timer(&kcpu_queue->fence_timeout);
+	timer_delete(&kcpu_queue->fence_timeout);
 #endif
 	KBASE_KTRACE_ADD_CSF_KCPU(kctx->kbdev, FENCE_WAIT_END, kcpu_queue,
 				  fence->context, fence->seqno);
@@ -1260,7 +1260,7 @@ static void kbase_kcpu_fence_wait_cancel(
 		 * the timer would already have been deactivated inside
 		 * kbase_csf_fence_wait_callback().
 		 */
-		del_timer_sync(&kcpu_queue->fence_timeout);
+		timer_delete_sync(&kcpu_queue->fence_timeout);
 #endif
 		if (removed)
 			KBASE_KTRACE_ADD_CSF_KCPU(kctx->kbdev, FENCE_WAIT_END,

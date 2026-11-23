@@ -662,7 +662,7 @@ void resetkoCancleTimer(struct FsmEntity *fsm)
 		return;
 	MR_Info("[%s_%d] %s\n", fsm->name, fsm->dongle_id, __func__);
 
-	del_timer(&fsm->resetTimer);
+	timer_delete(&fsm->resetTimer);
 	removeResetEvent(fsm->dongle_id, fsm->eModuleType, RFSM_EVENT_TIMEOUT);
 #endif
 }

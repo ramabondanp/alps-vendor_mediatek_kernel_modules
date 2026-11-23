@@ -65,7 +65,7 @@ void btmtk_reset_timer_update(struct btmtk_dev *bdev)
 void btmtk_reset_timer_del(struct btmtk_dev *bdev)
 {
 	if (timer_pending(&bdev->chip_reset_timer)) {
-		del_timer_sync(&bdev->chip_reset_timer);
+		timer_delete_sync(&bdev->chip_reset_timer);
 		BTMTK_INFO("%s exit", __func__);
 	}
 }

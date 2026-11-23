@@ -14906,7 +14906,7 @@ void wlanTpeUninit(struct GLUE_INFO *prGlueInfo)
 	if (!prAdapter->rWifiVar.ucTpEnhanceEnable)
 		return;
 
-	del_timer_sync(&(prGlueInfo->rTpeTimer));
+	timer_delete_sync(&(prGlueInfo->rTpeTimer));
 }
 
 int wlanTpeProcess(struct GLUE_INFO *prGlueInfo,
@@ -14991,7 +14991,7 @@ int wlanTpeProcess(struct GLUE_INFO *prGlueInfo,
 			prGlueInfo->u4TpeTimeout) {
 			/* Timeout already, flush out directly. */
 			if (timer_pending(&prGlueInfo->rTpeTimer))
-				del_timer(&prGlueInfo->rTpeTimer);
+				timer_delete(&prGlueInfo->rTpeTimer);
 			wlanTpeFlush(prGlueInfo);
 			kalSetEvent(prGlueInfo);
 		} else {

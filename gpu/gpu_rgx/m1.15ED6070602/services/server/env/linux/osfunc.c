@@ -1282,7 +1282,7 @@ PVRSRV_ERROR OSDisableTimer (IMG_HANDLE hTimer)
 	flush_workqueue(psTimerWorkQueue);
 
 	/* remove timer */
-	del_timer_sync(&psTimerCBData->sTimer);
+	timer_delete_sync(&psTimerCBData->sTimer);
 
 	/*
 	 * This second flush is to catch the case where the timer ran
