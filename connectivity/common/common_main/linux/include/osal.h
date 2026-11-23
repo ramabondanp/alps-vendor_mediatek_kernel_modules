@@ -139,7 +139,7 @@ typedef VOID(*P_TIMEOUT_HANDLER) (struct timer_list *t);
 typedef struct timer_list *timer_handler_arg;
 #define GET_HANDLER_DATA(arg, data) \
 do { \
-	P_OSAL_TIMER osal_timer = from_timer(osal_timer, arg, timer); \
+	P_OSAL_TIMER osal_timer = timer_container_of(osal_timer, arg, timer); \
 	data = osal_timer->timeroutHandlerData; \
 } while (0)
 #else
