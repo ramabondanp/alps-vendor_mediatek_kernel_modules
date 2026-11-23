@@ -86,33 +86,37 @@ met_trace_print_symbols_seq(char* pclass_name, unsigned long val,
 		met_trace_print_symbols_seq(pclass_name, value, symbols);		\
 	})
 
+/*
+ * The tracepoint probe prototype must use the kernel enum tag for KCFI,
+ * even though met_power.h provides its own enum for the same values.
+ */
+enum pm_qos_req_action {
+	PM_QOS_ADD_REQ,
+	PM_QOS_UPDATE_REQ,
+	PM_QOS_REMOVE_REQ
+};
+
 #ifdef pm_qos_update_request
 #undef pm_qos_update_request
 #endif
-void pm_qos_update_request(void *data, int pm_qos_class, s32 value)
+void pm_qos_update_request(void *data, s32 value)
 {
-	char class_name[64];
-
-	MET_TRACE("pm_qos_class=%s value=%d\n",
-	  __print_symbolic(class_name, pm_qos_class,
-		{ _PM_QOS_CPU_DMA_LATENCY,	"CPU_DMA_LATENCY" },
-		{ _PM_QOS_NETWORK_LATENCY,	"NETWORK_LATENCY" },
-		{ _PM_QOS_NETWORK_THROUGHPUT,	"NETWORK_THROUGHPUT" }),
-	  value);
+	MET_TRACE("value=%d\n", value);
 }
 
 #ifdef pm_qos_update_target
 #undef pm_qos_update_target
 #endif
-void pm_qos_update_target(void *data, unsigned int action, int prev_value, int curr_value)
+void pm_qos_update_target(void *data, enum pm_qos_req_action action,
+			  int prev_value, int curr_value)
 {
 	char class_name[64];
 
 	MET_TRACE("action=%s prev_value=%d curr_value=%d\n",
 	  __print_symbolic(class_name, action,
-		{ _PM_QOS_ADD_REQ,	"ADD_REQ" },
-		{ _PM_QOS_UPDATE_REQ,	"UPDATE_REQ" },
-		{ _PM_QOS_REMOVE_REQ,	"REMOVE_REQ" }),
+		{ PM_QOS_ADD_REQ,	"ADD_REQ" },
+		{ PM_QOS_UPDATE_REQ,	"UPDATE_REQ" },
+		{ PM_QOS_REMOVE_REQ,	"REMOVE_REQ" }),
 	  prev_value, curr_value);
 }
 #endif
