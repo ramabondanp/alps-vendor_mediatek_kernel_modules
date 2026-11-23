@@ -2627,7 +2627,7 @@ struct imgsys_cmdq_cust_data imgsys_cmdq_data_7sp = {
 	.quick_onoff_en = imgsys_quick_onoff_enable_plat7sp,
 };
 #if (KERNEL_VERSION(6, 13, 0) > LINUX_VERSION_CODE)
-MODULE_IMPORT_NS(DMA_BUF);
+MODULE_IMPORT_NS("DMA_BUF");
 #else
 MODULE_IMPORT_NS("DMA_BUF");
 #endif

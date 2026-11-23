@@ -2331,7 +2331,7 @@ module_platform_driver(mtk_mae_driver);
 MODULE_AUTHOR("Ming-Hsuan Chaing <ming-hsuan.chiang@mediatek.com>");
 MODULE_LICENSE("GPL v2");
 #if (KERNEL_VERSION(6, 13, 0) > LINUX_VERSION_CODE)
-MODULE_IMPORT_NS(DMA_BUF);
+MODULE_IMPORT_NS("DMA_BUF");
 #else
 MODULE_IMPORT_NS("DMA_BUF");
 #endif

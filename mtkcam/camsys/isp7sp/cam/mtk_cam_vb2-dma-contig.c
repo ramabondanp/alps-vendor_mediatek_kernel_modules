@@ -355,7 +355,7 @@ void mtk_cam_vb2_sync_for_cpu(struct vb2_buffer *vb)
 
 MODULE_DESCRIPTION("DMA-contig memory handling routines for mtk-cam videobuf2");
 #if (KERNEL_VERSION(6, 13, 0) > LINUX_VERSION_CODE)
-MODULE_IMPORT_NS(DMA_BUF);
+MODULE_IMPORT_NS("DMA_BUF");
 #else
 MODULE_IMPORT_NS("DMA_BUF");
 #endif

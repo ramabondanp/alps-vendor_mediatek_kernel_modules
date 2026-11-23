@@ -768,7 +768,7 @@ EXPORT_SYMBOL_GPL(aie_vb2_dma_contig_set_max_seg_size);
 
 MODULE_DESCRIPTION("AIE DMA-contig memory handling routines for videobuf2");
 #if (KERNEL_VERSION(6, 13, 0) > LINUX_VERSION_CODE)
-MODULE_IMPORT_NS(DMA_BUF);
+MODULE_IMPORT_NS("DMA_BUF");
 #else
 MODULE_IMPORT_NS("DMA_BUF");
 #endif

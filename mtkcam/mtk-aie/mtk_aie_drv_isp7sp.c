@@ -5579,7 +5579,7 @@ const struct mtk_aie_drv_ops aie_ops_isp7sp_1 = {
 };
 
 #if (KERNEL_VERSION(6, 13, 0) > LINUX_VERSION_CODE)
-MODULE_IMPORT_NS(DMA_BUF);
+MODULE_IMPORT_NS("DMA_BUF");
 #else
 MODULE_IMPORT_NS("DMA_BUF");
 #endif
