@@ -198,22 +198,27 @@ static int mtk_ipesys_me_probe(struct platform_device *pdev)
 	larb_node = of_parse_phandle(pdev->dev.of_node, "mediatek,larb", 0);
 	if (!larb_node) {
 		dev_info(me_dev->dev,
-			"%s: larb node not found\n", __func__);
+			"%s: larb node not found, skip SMI LARB link\n",
+			__func__);
+		goto skip_larb;
 	}
 
 	larb_pdev = of_find_device_by_node(larb_node);
-	if (!larb_pdev) {
-		of_node_put(larb_node);
-		dev_info(me_dev->dev,
-			"%s: larb device not found\n", __func__);
-	}
 	of_node_put(larb_node);
+	if (!larb_pdev) {
+		dev_info(me_dev->dev,
+			"%s: larb device not found, skip SMI LARB link\n",
+			__func__);
+		goto skip_larb;
+	}
 
 	link = device_link_add(&pdev->dev, &larb_pdev->dev,
 			DL_FLAG_PM_RUNTIME | DL_FLAG_STATELESS);
 
 	if (!link)
 		dev_info(me_dev->dev, "unable to link SMI LARB\n");
+
+skip_larb:
 
 	pm_runtime_enable(&pdev->dev);
 
