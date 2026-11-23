@@ -795,10 +795,10 @@ int mtk_cfg_set_bitrate_mask(struct wiphy *wiphy,
 			     const struct cfg80211_bitrate_mask *mask);
 #endif
 int mtk_cfg_set_txpower(struct wiphy *wiphy,
-			struct wireless_dev *wdev,
+			struct wireless_dev *wdev, int radio_idx,
 			enum nl80211_tx_power_setting type, int mbm);
 int mtk_cfg_get_txpower(struct wiphy *wiphy,
-			struct wireless_dev *wdev,
+			struct wireless_dev *wdev, int radio_idx,
 #if KERNEL_VERSION(6, 14, 0) <= CFG80211_VERSION_CODE
 			unsigned int link_id,
 #endif
