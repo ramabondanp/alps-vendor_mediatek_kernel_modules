@@ -103,12 +103,11 @@ struct FsmEntity *allocFsmEntity(uint32_t dongle_id,
 	ret = snprintf(wakeupSourceName, RFSM_NAME_MAX_LEN,
 			"resetko_%s_%d", name, dongle_id);
 	if (ret > 0) {
-		fsm->wakeupSource = wakeup_source_create(wakeupSourceName);
+		fsm->wakeupSource = wakeup_source_register(NULL, wakeupSourceName);
 		if (!fsm->wakeupSource) {
 			MR_Err("[%s_%d] fail to create wakeup resource(%s)\n",
 				name, dongle_id, wakeupSourceName);
 		} else {
-			wakeup_source_add(fsm->wakeupSource);
 			MR_Info("[%s_%d] create wakeup resource (%s)\n",
 				name, dongle_id, wakeupSourceName);
 		}
@@ -125,8 +124,7 @@ void freeFsmEntity(struct FsmEntity *fsm)
 
 #if CFG_RESETKO_ENABLE_WAKE_LOCK
 	if (fsm->wakeupSource) {
-		wakeup_source_remove(fsm->wakeupSource);
-		wakeup_source_destroy(fsm->wakeupSource);
+		wakeup_source_unregister(fsm->wakeupSource);
 		fsm->wakeupSource = NULL;
 	}
 #endif
