@@ -134,7 +134,7 @@ static void connlog_emi_status_dump(void);
 /* connlog when suspend */
 static int connlog_alarm_init(void);
 #if (KERNEL_VERSION(6, 13, 0) > LINUX_VERSION_CODE)
-static enum alarmtimer_restart alarm_timer_handler(struct alarm *alarm, ktime_t);
+static void alarm_timer_handler(struct alarm *alarm, ktime_t);
 #else
 static void alarm_timer_handler(struct alarm *alarm, ktime_t);
 #endif
@@ -674,7 +674,7 @@ EXPORT_SYMBOL(connsys_log_blank_state_changed);
 *  void
 *****************************************************************************/
 #if (KERNEL_VERSION(6, 13, 0) > LINUX_VERSION_CODE)
-static enum alarmtimer_restart alarm_timer_handler(struct alarm *alarm,
+static void alarm_timer_handler(struct alarm *alarm,
 	ktime_t now)
 #else
 static void alarm_timer_handler(struct alarm *alarm, ktime_t now)
@@ -698,7 +698,7 @@ static void alarm_timer_handler(struct alarm *alarm, ktime_t now)
 	spin_unlock_irqrestore(&gDev.log_alarm.alarm_lock, gDev.log_alarm.flags);
 
 #if (KERNEL_VERSION(6, 13, 0) > LINUX_VERSION_CODE)
-	return ALARMTIMER_NORESTART;
+	return;
 #endif
 }
 

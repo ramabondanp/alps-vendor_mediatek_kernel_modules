@@ -1921,8 +1921,7 @@ static int imgsensor_probe(struct i3c_i2c_device *client)
 		adaptor_loge(ctx, "failed to wakeup_source_register\n");
 
 	/* init hrtimer */
-	hrtimer_init(&ctx->streamon_hrtimer, CLOCK_MONOTONIC, HRTIMER_MODE_REL);
-	ctx->streamon_hrtimer.function = &trigger_streamon_work;
+	hrtimer_setup(&ctx->streamon_hrtimer, &trigger_streamon_work, CLOCK_MONOTONIC, HRTIMER_MODE_REL);
 
 	kthread_init_worker(&ctx->adaptor_worker);
 	ctx->adaptor_kworker_task = kthread_run(kthread_worker_fn,

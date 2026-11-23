@@ -226,8 +226,7 @@ static void __met_hrtimer_register(void *unused)
 	if (!(met_switch.mode & MT_SWITCH_EVENT_TIMER)) {
 
 		hrtimer = &met_cpu_ptr->hrtimer;
-		hrtimer_init(hrtimer, CLOCK_MONOTONIC, HRTIMER_MODE_REL);
-		hrtimer->function = met_hrtimer_notify;
+		hrtimer_setup(hrtimer, met_hrtimer_notify, CLOCK_MONOTONIC, HRTIMER_MODE_REL);
 
 		if (DEFAULT_HRTIMER_EXPIRE) {
 			met_cpu_ptr->work_enabled = 1;
@@ -457,8 +456,7 @@ int sampler_start(void)
 		met_cpu_ptr = per_cpu_ptr(met_cpu, cpu);
 		met_cpu_ptr->work_enabled = 0;
 		met_cpu_ptr->hrtimer_online_check = 0;
-		hrtimer_init(&met_cpu_ptr->hrtimer, CLOCK_MONOTONIC, HRTIMER_MODE_REL);
-		met_cpu_ptr->hrtimer.function = met_hrtimer_notify;
+		hrtimer_setup(&met_cpu_ptr->hrtimer, met_hrtimer_notify, CLOCK_MONOTONIC, HRTIMER_MODE_REL);
 		INIT_DELAYED_WORK(&met_cpu_ptr->dwork, wq_sync_buffer);
 	}
 

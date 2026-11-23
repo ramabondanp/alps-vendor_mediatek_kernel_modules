@@ -5241,10 +5241,7 @@ int mtk_camsys_ctrl_start(struct mtk_cam_ctx *ctx)
 	INIT_LIST_HEAD(&camsys_sensor_ctrl->camsys_state_list);
 	spin_lock_init(&camsys_sensor_ctrl->camsys_state_lock);
 	if (ctx->sensor) {
-		hrtimer_init(&camsys_sensor_ctrl->sensor_deadline_timer,
-			     CLOCK_MONOTONIC, HRTIMER_MODE_REL);
-		camsys_sensor_ctrl->sensor_deadline_timer.function =
-			sensor_deadline_timer_handler;
+		hrtimer_setup(&camsys_sensor_ctrl->sensor_deadline_timer, sensor_deadline_timer_handler, CLOCK_MONOTONIC, HRTIMER_MODE_REL);
 		camsys_sensor_ctrl->sensorsetting_wq = &ctx->sensor_worker;
 	}
 	kthread_init_work(&camsys_sensor_ctrl->work, mtk_cam_sensor_worker_in_sensorctrl);

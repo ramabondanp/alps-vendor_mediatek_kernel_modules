@@ -7133,12 +7133,10 @@ int kbase_csf_scheduler_early_init(struct kbase_device *kbdev)
 	atomic_set(&scheduler->gpu_no_longer_idle, false);
 	atomic_set(&scheduler->non_idle_offslot_grps, 0);
 
-	hrtimer_init(&scheduler->tick_timer, CLOCK_MONOTONIC, HRTIMER_MODE_REL);
-	scheduler->tick_timer.function = tick_timer_callback;
+	hrtimer_setup(&scheduler->tick_timer, tick_timer_callback, CLOCK_MONOTONIC, HRTIMER_MODE_REL);
 #if IS_ENABLED(CONFIG_MALI_MTK_ADAPTIVE_POWER_POLICY)
 	scheduler->apo_support = ged_gpu_apo_support();
-	hrtimer_init(&scheduler->apo_idle_timer, CLOCK_MONOTONIC, HRTIMER_MODE_REL);
-	scheduler->apo_idle_timer.function = apo_idle_timer_callback;
+	hrtimer_setup(&scheduler->apo_idle_timer, apo_idle_timer_callback, CLOCK_MONOTONIC, HRTIMER_MODE_REL);
 #endif /* CONFIG_MALI_MTK_ADAPTIVE_POWER_POLICY */
 
 	kbase_csf_tiler_heap_reclaim_mgr_init(kbdev);

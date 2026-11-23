@@ -1388,7 +1388,7 @@ static int connlog_cancel_alarm_timer(void)
 
 
 #if (KERNEL_VERSION(6, 13, 0) > LINUX_VERSION_CODE)
-static enum alarmtimer_restart connlog_alarm_timer_handler(struct alarm *alarm,
+static void connlog_alarm_timer_handler(struct alarm *alarm,
 	ktime_t now)
 #else
 static void connlog_alarm_timer_handler(struct alarm *alarm, ktime_t now)
@@ -1417,7 +1417,7 @@ static void connlog_alarm_timer_handler(struct alarm *alarm, ktime_t now)
 	spin_unlock_irqrestore(&gLogAlarm.alarm_lock, gLogAlarm.flags);
 
 #if (KERNEL_VERSION(6, 13, 0) > LINUX_VERSION_CODE)
-	return ALARMTIMER_NORESTART;
+	return;
 #endif
 }
 

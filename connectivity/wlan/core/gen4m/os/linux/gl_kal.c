@@ -7165,30 +7165,7 @@ enum hrtimer_restart kalHrtimerTimeout(struct hrtimer *prHrtimer)
 /*----------------------------------------------------------------------------*/
 void kalHrtimerInit(struct hrtimer *prTimer)
 {
-	hrtimer_init(prTimer, CLOCK_BOOTTIME, HRTIMER_MODE_ABS);
-}
-
-/*----------------------------------------------------------------------------*/
-/*!
- * @brief  Start hrtimer.
- */
-/*----------------------------------------------------------------------------*/
-void kalHrtimerStart(struct hrtimer *prTimer, uint32_t delayMs)
-{
-	ktime_t kTargetTime;
-
-	if (!kalHrtimerIsInit(prTimer)) {
-		DBGLOG(INIT, WARN, "hrtimer has not init\n");
-		return;
-	}
-
-	kTargetTime = ktime_get_boottime();
-	kTargetTime = ktime_add(kTargetTime, ms_to_ktime(delayMs));
-
-	if (kalHrtimerIsRunning(prTimer))
-		kalHrtimerCancel(prTimer);
-
-	prTimer->function = kalHrtimerTimeout;
+	hrtimer_setup(prTimer, kalHrtimerTimeout, CLOCK_BOOTTIME, HRTIMER_MODE_ABS);
 	hrtimer_start(prTimer, kTargetTime, HRTIMER_MODE_ABS);
 
 	DBGLOG(INIT, TRACE, "hrtimer %p %lldms started\n", prTimer, delayMs);
@@ -7289,7 +7266,7 @@ void kalAlarmTimerTimeout(struct alarm *prAlarmTimer, ktime_t now)
 	wake_up_interruptible(&prGlueInfo->waitq);
 
 #if (KERNEL_VERSION(6, 13, 0) > CFG80211_VERSION_CODE)
-	return ALARMTIMER_NORESTART;
+	return;
 #endif
 }
 
@@ -16756,9 +16733,7 @@ static inline void kalNapiDelayTimerStart(struct GLUE_INFO *pr,
 
 static void kalNapiDelayTimerInit(struct GLUE_INFO *pr)
 {
-	hrtimer_init(&pr->rNapiDelayTimer, CLOCK_MONOTONIC,
-			HRTIMER_MODE_REL);
-	pr->rNapiDelayTimer.function = kalNapiDelayTimeout;
+	hrtimer_setup(&pr->rNapiDelayTimer, kalNapiDelayTimeout, CLOCK_MONOTONIC, HRTIMER_MODE_REL);
 	pr->ulNapiDelayFlag = 0;
 }
 

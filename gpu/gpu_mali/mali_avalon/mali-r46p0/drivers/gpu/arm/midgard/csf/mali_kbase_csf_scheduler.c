@@ -6989,8 +6989,7 @@ int kbase_csf_scheduler_init(struct kbase_device *kbdev)
 #endif /* !CONFIG_MALI_NO_MALI */
 
 	spin_lock_init(&scheduler->gpu_metrics_lock);
-	hrtimer_init(&scheduler->gpu_metrics_timer, CLOCK_MONOTONIC, HRTIMER_MODE_REL_SOFT);
-	scheduler->gpu_metrics_timer.function = gpu_metrics_timer_callback;
+	hrtimer_setup(&scheduler->gpu_metrics_timer, gpu_metrics_timer_callback, CLOCK_MONOTONIC, HRTIMER_MODE_REL_SOFT);
 #endif /* CONFIG_MALI_TRACE_POWER_GPU_WORK_PERIOD */
 
 	return kbase_csf_mcu_shared_regs_data_init(kbdev);
@@ -7026,12 +7025,10 @@ int kbase_csf_scheduler_early_init(struct kbase_device *kbdev)
 	scheduler->csg_scheduling_period_ms = CSF_SCHEDULER_TIME_TICK_MS;
 	scheduler_doorbell_init(kbdev);
 	INIT_WORK(&scheduler->gpu_idle_work, gpu_idle_worker);
-	hrtimer_init(&scheduler->tick_timer, CLOCK_MONOTONIC, HRTIMER_MODE_REL);
-	scheduler->tick_timer.function = tick_timer_callback;
+	hrtimer_setup(&scheduler->tick_timer, tick_timer_callback, CLOCK_MONOTONIC, HRTIMER_MODE_REL);
 #if IS_ENABLED(CONFIG_MALI_MTK_ADAPTIVE_POWER_POLICY)
 	scheduler->apo_support = ged_gpu_apo_support();
-	hrtimer_init(&scheduler->apo_idle_timer, CLOCK_MONOTONIC, HRTIMER_MODE_REL);
-	scheduler->apo_idle_timer.function = apo_idle_timer_callback;
+	hrtimer_setup(&scheduler->apo_idle_timer, apo_idle_timer_callback, CLOCK_MONOTONIC, HRTIMER_MODE_REL);
 #endif /* CONFIG_MALI_MTK_ADAPTIVE_POWER_POLICY */
 
 	kbase_csf_tiler_heap_reclaim_mgr_init(kbdev);

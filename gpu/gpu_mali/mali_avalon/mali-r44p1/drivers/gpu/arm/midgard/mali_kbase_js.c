@@ -739,8 +739,7 @@ int kbasep_js_devdata_init(struct kbase_device * const kbdev)
 		gpu_metrics_tp_emit_interval_ns = DEFAULT_GPU_METRICS_TP_EMIT_INTERVAL_NS;
 	}
 
-	hrtimer_init(&jsdd->gpu_metrics_timer, CLOCK_MONOTONIC, HRTIMER_MODE_REL);
-	jsdd->gpu_metrics_timer.function = gpu_metrics_timer_callback;
+	hrtimer_setup(&jsdd->gpu_metrics_timer, gpu_metrics_timer_callback, CLOCK_MONOTONIC, HRTIMER_MODE_REL);
 	jsdd->gpu_metrics_timer_needed = false;
 	jsdd->gpu_metrics_timer_running = false;
 #endif

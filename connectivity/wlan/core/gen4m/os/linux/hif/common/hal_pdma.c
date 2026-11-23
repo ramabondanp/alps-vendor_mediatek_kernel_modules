@@ -2278,9 +2278,7 @@ bool halHifSwInfoInit(struct ADAPTER *prAdapter)
 
 #if (CFG_SUPPORT_TX_DATA_DELAY == 1)
 #if CFG_SUPPORT_HRTIMER
-	hrtimer_init(&prHifInfo->rTxDelayTimer, CLOCK_MONOTONIC,
-		HRTIMER_MODE_REL);
-	prHifInfo->rTxDelayTimer.function = halTxDelayTimeout;
+	hrtimer_setup(&prHifInfo->rTxDelayTimer, halTxDelayTimeout, CLOCK_MONOTONIC, HRTIMER_MODE_REL);
 	prHifInfo->rTxDelayTimerData = (unsigned long)prAdapter->prGlueInfo;
 #else /* CFG_SUPPORT_HRTIMER == 0 */
 #if (KERNEL_VERSION(4, 15, 0) <= LINUX_VERSION_CODE)

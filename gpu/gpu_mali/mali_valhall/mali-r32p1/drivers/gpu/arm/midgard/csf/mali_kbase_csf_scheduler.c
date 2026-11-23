@@ -5563,8 +5563,7 @@ int kbase_csf_scheduler_early_init(struct kbase_device *kbdev)
 	atomic_set(&scheduler->gpu_no_longer_idle, false);
 	atomic_set(&scheduler->non_idle_offslot_grps, 0);
 
-	hrtimer_init(&scheduler->tick_timer, CLOCK_MONOTONIC, HRTIMER_MODE_REL);
-	scheduler->tick_timer.function = tick_timer_callback;
+	hrtimer_setup(&scheduler->tick_timer, tick_timer_callback, CLOCK_MONOTONIC, HRTIMER_MODE_REL);
 	scheduler->tick_timer_active = false;
 
 	return 0;
