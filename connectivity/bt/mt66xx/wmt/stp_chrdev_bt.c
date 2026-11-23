@@ -12,6 +12,10 @@
 #include <linux/fb.h>
 #include <linux/suspend.h>
 
+#ifndef FB_EVENT_BLANK
+#define FB_EVENT_BLANK 0x09
+#endif
+
 MODULE_LICENSE("Dual BSD/GPL");
 
 /*******************************************************************************

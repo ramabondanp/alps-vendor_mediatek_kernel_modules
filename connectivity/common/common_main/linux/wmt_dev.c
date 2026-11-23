@@ -79,6 +79,10 @@
 
 #include "connsys_debug_utility.h"
 
+#ifndef FB_EVENT_BLANK
+#define FB_EVENT_BLANK 0x09
+#endif
+
 #ifdef CONFIG_COMPAT
 #define COMPAT_WMT_IOCTL_SET_PATCH_NAME		_IOW(WMT_IOC_MAGIC, 4, compat_uptr_t)
 #define COMPAT_WMT_IOCTL_LPBK_TEST		_IOWR(WMT_IOC_MAGIC, 8, compat_uptr_t)
