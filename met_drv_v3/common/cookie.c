@@ -150,7 +150,7 @@ void met_cookie_polling(unsigned long long stamp, int cpu)
 	if (user_mode(regs)) {
 		struct mm_struct *mm;
 		struct vm_area_struct *vma;
-		struct path *ppath;
+		const struct path *ppath;
 
 		mm = current->mm;
 #if KERNEL_VERSION(6, 0, 0) <= LINUX_VERSION_CODE
