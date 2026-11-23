@@ -1979,7 +1979,7 @@ static int mtk_vfd_open(struct file *filp)
 		goto err_free_ctrl_handler;
 	}
 
-	v4l2_fh_add(&ctx->fh);
+	v4l2_fh_add(&ctx->fh, filp);
 
 	return 0;
 
@@ -1997,7 +1997,7 @@ static int mtk_vfd_release(struct file *filp)
 
 	v4l2_m2m_ctx_release(ctx->fh.m2m_ctx);
 
-	v4l2_fh_del(&ctx->fh);
+	v4l2_fh_del(&ctx->fh, filp);
 	v4l2_fh_exit(&ctx->fh);
 
 	kfree(ctx);
