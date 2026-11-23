@@ -155,7 +155,6 @@ static void kbase_free_pages_worker(struct work_struct *work)
 		lock_page(p);
 		page_md = kbase_page_private(p);
 		if (page_md && IS_PAGE_MOVABLE(page_md->status)) {
-			ClearPageMovableOps(p);
 			page_md->status = PAGE_MOVABLE_CLEAR(page_md->status);
 		}
 		kbase_free_page_metadata(kbdev, p, &group_id);
@@ -245,7 +244,6 @@ static int kbasep_migrate_page_pt_mapped(struct page *old_page, struct page *new
 
 	if (ret == 0) {
 		dma_unmap_page(kbdev->dev, old_dma_addr, PAGE_SIZE, DMA_BIDIRECTIONAL);
-		ClearPageMovableOps(old_page);
 		ClearPagePrivate(old_page);
 		put_page(old_page);
 
@@ -361,7 +359,6 @@ static int kbasep_migrate_page_allocated_mapped(struct page *old_page, struct pa
 
 		/* Clear PG_movable from the old page and release reference. */
 		ClearPagePrivate(old_page);
-		ClearPageMovableOps(old_page);
 		put_page(old_page);
 
 		/* Set PG_movable to the new page. */
@@ -475,7 +472,6 @@ static bool kbase_page_isolate(struct page *p, isolate_mode_t mode)
 		break;
 	case NOT_MOVABLE:
 		/* Opportunistically clear the movable property for these pages */
-		ClearPageMovableOps(p);
 		page_md->status = PAGE_MOVABLE_CLEAR(page_md->status);
 		break;
 	default:
@@ -605,7 +601,6 @@ static int kbase_page_migrate(struct page *new_page, struct page *old_page, enum
 		struct kbase_mem_migrate *mem_migrate = &kbdev->mem_migrate;
 
 		kbase_free_page_metadata(kbdev, old_page, NULL);
-		ClearPageMovableOps(old_page);
 		put_page(old_page);
 
 		/* Just free new page to avoid lock contention. */
@@ -628,7 +623,6 @@ static int kbase_page_migrate(struct page *new_page, struct page *old_page, enum
 	 * expect.
 	 */
 	if (err < 0 && err != -EAGAIN) {
-		ClearPageMovableOps(old_page);
 		page_md->status = PAGE_MOVABLE_CLEAR(page_md->status);
 	}
 
@@ -705,7 +699,6 @@ static void kbase_page_putback(struct page *p)
 	 */
 	if (status_mem_pool || status_free_isolated_in_progress ||
 	    status_free_pt_isolated_in_progress) {
-		ClearPageMovableOps(p);
 		page_md->status = PAGE_MOVABLE_CLEAR(page_md->status);
 		if (!WARN_ON_ONCE(!kbdev)) {
 			struct kbase_mem_migrate *mem_migrate = &kbdev->mem_migrate;
