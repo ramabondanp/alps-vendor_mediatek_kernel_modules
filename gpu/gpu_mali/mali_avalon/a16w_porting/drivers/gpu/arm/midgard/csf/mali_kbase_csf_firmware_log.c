@@ -238,7 +238,6 @@ static const struct file_operations kbasep_csf_firmware_log_debugfs_fops = {
 	.open = kbasep_csf_firmware_log_debugfs_open,
 	.read = kbasep_csf_firmware_log_debugfs_read,
 #if (KERNEL_VERSION(6, 12, 0) > LINUX_VERSION_CODE)
-	.llseek = no_llseek,
 #endif
 };
 

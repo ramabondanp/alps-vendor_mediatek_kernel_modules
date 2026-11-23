@@ -529,7 +529,6 @@ static const struct file_operations pdp_driver_fops = {
 	.mmap		= drm_gem_mmap,
 	.poll		= drm_poll,
 	.read		= drm_read,
-	.llseek		= noop_llseek,
 #ifdef CONFIG_COMPAT
 	.compat_ioctl	= drm_compat_ioctl,
 #endif

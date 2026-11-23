@@ -3103,7 +3103,6 @@ static const struct file_operations fops_force_dump_mmu = {
 	.read = force_dump_mmu_read,
 	.write = force_dump_mmu_write,
 #if (KERNEL_VERSION(6, 12, 0) > LINUX_VERSION_CODE)
-	.llseek = no_llseek,
 #endif
 };
 #endif /* CONFIG_MALI_MTK_MMU_DUMP */
