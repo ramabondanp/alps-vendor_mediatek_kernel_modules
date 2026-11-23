@@ -207,6 +207,18 @@ static inline struct mtk_aie_ctx *fh_to_ctx(struct v4l2_fh *fh)
 {
 	return container_of(fh, struct mtk_aie_ctx, fh);
 }
+
+/*
+ * v4l_s_fmt()/v4l_g_fmt() pass fh == NULL since the 6.18 V4L2 core.
+ * Derive the context from file->private_data instead of the ioctl fh.
+ */
+static inline struct mtk_aie_ctx *file_to_ctx(struct file *file)
+{
+	if (!file->private_data)
+		return NULL;
+
+	return container_of(file->private_data, struct mtk_aie_ctx, fh);
+}
 #if CHECK_SERVICE_0
 static void mtk_aie_mmdvfs_init(struct mtk_aie_dev *fd)
 {
@@ -1305,7 +1317,10 @@ static int mtk_aie_try_fmt_out_mp(struct file *file, void *fh,
 static int mtk_aie_g_fmt_out_mp(struct file *file, void *fh,
 				struct v4l2_format *f)
 {
-	struct mtk_aie_ctx *ctx = fh_to_ctx(fh);
+	struct mtk_aie_ctx *ctx = file_to_ctx(file);
+
+	if (!ctx)
+		return -EINVAL;
 
 	f->fmt.pix_mp = ctx->src_fmt;
 
@@ -1318,13 +1333,13 @@ static int mtk_aie_s_fmt_out_mp(struct file *file, void *fh,
 	struct mtk_aie_ctx *ctx;
 	struct vb2_queue *vq;
 
-	ctx = fh_to_ctx(fh);
-	if (ctx == NULL)
-		return -1;
+	ctx = file_to_ctx(file);
+	if (!ctx || !ctx->fh.m2m_ctx)
+		return -EINVAL;
 
 	vq = v4l2_m2m_get_vq(ctx->fh.m2m_ctx, f->type);
 	if (vq == NULL)
-		return -1;
+		return -EINVAL;
 
 	/* Change not allowed if queue is streaming. */
 	if (vb2_is_streaming(vq)) {
