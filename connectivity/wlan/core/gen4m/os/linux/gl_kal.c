@@ -7471,7 +7471,7 @@ void kalTimeoutHandler(unsigned long arg)
 {
 #if KERNEL_VERSION(4, 15, 0) <= LINUX_VERSION_CODE
 	struct GLUE_INFO *prGlueInfo =
-		from_timer(prGlueInfo, timer, tickfn);
+		timer_container_of(prGlueInfo, timer, tickfn);
 #else
 	struct GLUE_INFO *prGlueInfo = (struct GLUE_INFO *)arg;
 #endif
@@ -17432,7 +17432,7 @@ void kalTpeTimeoutHandler(unsigned long ulData)
 #endif
 {
 #if KERNEL_VERSION(4, 15, 0) <= LINUX_VERSION_CODE
-	struct GLUE_INFO *prGlueInfo = from_timer(prGlueInfo, timer, rTpeTimer);
+	struct GLUE_INFO *prGlueInfo = timer_container_of(prGlueInfo, timer, rTpeTimer);
 #else
 	struct GLUE_INFO *prGlueInfo = (struct GLUE_INFO *)ulData;
 #endif
@@ -17692,7 +17692,7 @@ void kalTxDirectTimerCheckSkbQ(unsigned long data)
 {
 #if KERNEL_VERSION(4, 15, 0) <= LINUX_VERSION_CODE
 	struct GLUE_INFO *prGlueInfo =
-		from_timer(prGlueInfo, timer, rTxDirectSkbTimer);
+		timer_container_of(prGlueInfo, timer, rTxDirectSkbTimer);
 #else
 	struct GLUE_INFO *prGlueInfo = (struct GLUE_INFO *)data;
 #endif
@@ -17711,7 +17711,7 @@ void kalTxDirectTimerCheckHifQ(unsigned long data)
 
 #if KERNEL_VERSION(4, 15, 0) <= LINUX_VERSION_CODE
 	struct GLUE_INFO *prGlueInfo =
-		from_timer(prGlueInfo, timer, rTxDirectHifTimer);
+		timer_container_of(prGlueInfo, timer, rTxDirectHifTimer);
 #else
 	struct GLUE_INFO *prGlueInfo = (struct GLUE_INFO *)data;
 #endif

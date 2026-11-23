@@ -5938,7 +5938,7 @@ void kalTimeoutHandler(unsigned long arg)
 
 #if KERNEL_VERSION(4, 15, 0) <= LINUX_VERSION_CODE
 	struct GLUE_INFO *prGlueInfo =
-		from_timer(prGlueInfo, timer, tickfn);
+		timer_container_of(prGlueInfo, timer, tickfn);
 #else
 	struct GLUE_INFO *prGlueInfo = (struct GLUE_INFO *) arg;
 #endif

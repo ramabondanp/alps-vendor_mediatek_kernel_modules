@@ -53,7 +53,7 @@ static void btmtk_reset_timer(unsigned long arg)
 #else
 static void btmtk_reset_timer(struct timer_list *timer)
 {
-	struct btmtk_dev *bt0 = btmtk_get_bt0(from_timer(bt0, timer, chip_reset_timer));
+	struct btmtk_dev *bt0 = btmtk_get_bt0(timer_container_of(bt0, timer, chip_reset_timer));
 
 	if (bt0 == NULL) {
 		BTMTK_ERR("%s bt0 is NULL", __func__);

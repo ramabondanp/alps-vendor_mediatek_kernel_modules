@@ -3365,7 +3365,7 @@ void halHwRecoveryTimeout(unsigned long arg)
 {
 #if KERNEL_VERSION(4, 15, 0) <= LINUX_VERSION_CODE
 	struct GL_HIF_INFO *prHif =
-		from_timer(prHif, timer, rSerTimer);
+		timer_container_of(prHif, timer, rSerTimer);
 	struct GLUE_INFO *prGlueInfo =
 		container_of(prHif, typeof(*prGlueInfo), rHifInfo);
 #else

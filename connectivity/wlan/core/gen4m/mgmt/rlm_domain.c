@@ -11801,7 +11801,7 @@ void txPwrCtrlCMDTimeout(unsigned long data)
 {
 #if KERNEL_VERSION(4, 15, 0) <= CFG80211_VERSION_CODE
 	struct GLUE_INFO *prGlueInfo =
-		from_timer(prGlueInfo, timer, rTxPowerLimitTimer);
+		timer_container_of(prGlueInfo, timer, rTxPowerLimitTimer);
 #else
 	struct GLUE_INFO *prGlueInfo = (struct GLUE_INFO *)data;
 #endif

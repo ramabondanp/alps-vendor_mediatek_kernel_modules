@@ -334,7 +334,7 @@ int setup_io_region(struct pci_dev *pdev,
 #if defined(TC_FAKE_INTERRUPTS)
 void tc_irq_fake_wrapper(struct timer_list *t)
 {
-	struct tc_device *tc = from_timer(tc, t, timer);
+	struct tc_device *tc = timer_container_of(tc, t, timer);
 
 	if (tc->odin)
 		odin_irq_handler(0, tc);

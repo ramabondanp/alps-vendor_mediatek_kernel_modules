@@ -87,7 +87,7 @@ static void btmtk_fw_own_timer(unsigned long arg)
 #else
 static void btmtk_fw_own_timer(struct timer_list *timer)
 {
-	struct btmtk_uart_dev *cif_dev = from_timer(cif_dev, timer, fw_own_timer);
+	struct btmtk_uart_dev *cif_dev = timer_container_of(cif_dev, timer, fw_own_timer);
 
 	if (atomic_read(&cif_dev->fw_own_timer_flag)) {
 		atomic_set(&cif_dev->fw_own_timer_flag, FW_OWN_TIMER_RUNNING);

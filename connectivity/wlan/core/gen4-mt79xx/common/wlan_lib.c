@@ -14840,7 +14840,7 @@ void wlanTpeTimeoutHandler(unsigned long data)
 
 #if KERNEL_VERSION(4, 14, 0) <= LINUX_VERSION_CODE
 	struct GLUE_INFO *prGlueInfo =
-		from_timer(prGlueInfo, timer, rTpeTimer);
+		timer_container_of(prGlueInfo, timer, rTpeTimer);
 #else
 	struct GLUE_INFO *prGlueInfo = (struct GLUE_INFO *)data;
 #endif

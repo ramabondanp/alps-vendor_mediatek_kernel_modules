@@ -213,7 +213,7 @@ SENTEST_GET_DBG_ERR_EXIT:
 
 static void seninf_sentest_watchdog_timer_callback(struct timer_list *t)
 {
-	struct mtk_cam_sentest_watchdog *wd = from_timer(wd, t, timer);
+	struct mtk_cam_sentest_watchdog *wd = timer_container_of(wd, t, timer);
 	struct seninf_ctx *ctx =
 		container_of(wd, struct seninf_ctx, sentest_watchdog);
 

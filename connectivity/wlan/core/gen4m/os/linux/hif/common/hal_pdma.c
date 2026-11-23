@@ -2014,7 +2014,7 @@ void halTxDelayTimeout(unsigned long arg)
 #else /* CFG_SUPPORT_HRTIMER == 0 */
 #if (KERNEL_VERSION(4, 15, 0) <= LINUX_VERSION_CODE)
 	struct GL_HIF_INFO *prHifInfo =
-		from_timer(prHifInfo, timer, rTxDelayTimer);
+		timer_container_of(prHifInfo, timer, rTxDelayTimer);
 	struct GLUE_INFO *prGlueInfo =
 		(struct GLUE_INFO *)prHifInfo->rTxDelayTimerData;
 #else
@@ -5277,7 +5277,7 @@ void halHwRecoveryTimeout(unsigned long arg)
 #endif
 {
 #if (LINUX_VERSION_CODE >= KERNEL_VERSION(4, 15, 0))
-	struct GL_HIF_INFO *prHif = from_timer(prHif, timer, rSerTimer);
+	struct GL_HIF_INFO *prHif = timer_container_of(prHif, timer, rSerTimer);
 	struct GLUE_INFO *prGlueInfo = (struct GLUE_INFO *)prHif->rSerTimerData;
 #else
 	struct GLUE_INFO *prGlueInfo = (struct GLUE_INFO *)arg;

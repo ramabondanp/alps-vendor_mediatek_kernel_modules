@@ -616,7 +616,7 @@ static void resetkoTimeoutHandler(unsigned long arg)
 #endif
 {
 #if KERNEL_VERSION(4, 15, 0) <= LINUX_VERSION_CODE
-	struct FsmEntity *fsm = from_timer(fsm, timer, resetTimer);
+	struct FsmEntity *fsm = timer_container_of(fsm, timer, resetTimer);
 #else
 	struct FsmEntity *fsm = (struct FsmEntity *)arg;
 #endif

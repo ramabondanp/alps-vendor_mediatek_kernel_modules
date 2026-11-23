@@ -10247,7 +10247,7 @@ static void mtk_cam_ctx_watchdog_worker(struct work_struct *work)
 
 static void mtk_ctx_watchdog(struct timer_list *t)
 {
-	struct mtk_cam_ctx *ctx = from_timer(ctx, t, watchdog_timer);
+	struct mtk_cam_ctx *ctx = timer_container_of(ctx, t, watchdog_timer);
 	struct mtk_cam_device *cam = ctx->cam;
 	struct mtk_raw_device *raw;
 	struct device *dev;

@@ -1950,7 +1950,7 @@ void mddpGenSwitchMsgTimeout(unsigned long arg)
 {
 #if KERNEL_VERSION(4, 15, 0) <= LINUX_VERSION_CODE
 	struct GL_HIF_INFO *prHif =
-		from_timer(prHif, timer, rGenSwitch4MddpTimer);
+		timer_container_of(prHif, timer, rGenSwitch4MddpTimer);
 	struct GLUE_INFO *prGlueInfo = (struct GLUE_INFO *)prHif->rSerTimerData;
 #else
 	struct GLUE_INFO *prGlueInfo = (struct GLUE_INFO *)arg;

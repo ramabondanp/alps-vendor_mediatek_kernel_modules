@@ -37,7 +37,7 @@ static void btmtk_reset_timer(unsigned long arg)
 #else
 static void btmtk_reset_timer(struct timer_list *timer)
 {
-	struct btmtk_dev *bdev = from_timer(bdev, timer, chip_reset_timer);
+	struct btmtk_dev *bdev = timer_container_of(bdev, timer, chip_reset_timer);
 
 	BTMTK_INFO("%s: chip_reset not trigger in %d seconds, trigger it directly",
 		__func__, CHIP_RESET_TIMEOUT);
