@@ -22,6 +22,7 @@
 
 #include <uapi/linux/mtk_ccd_controls.h>
 #include <uapi/linux/dma-heap.h>
+MODULE_IMPORT_NS("ANDROID_GKI_VFS_internal_I_am_really_a_filesystem_and_am_NOT_a_driver");
 
 #define CCD_ALLOCATE_MAX_BUFFER_SIZE 0x20000000UL /*512MB*/
 struct mtk_ccd_buf;
