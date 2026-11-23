@@ -197,7 +197,7 @@ void kalSetDramBoost(struct ADAPTER *prAdapter, int32_t iLv)
 #endif /* CONFIG_OF */
 	static unsigned int peak_bw[OPP_BW_MAX_NUM] = {0}, current_bw;
 	unsigned int prev_bw = 0;
-	uint32_t u4MaxIdx, i;
+	uint32_t u4MaxIdx, i __maybe_unused;
 
 	u4MaxIdx = kalGetDramBwMaxIdx();
 	if (u4MaxIdx == 0 || u4MaxIdx > OPP_BW_MAX_NUM)

@@ -38,6 +38,7 @@
 #include <net/rps.h>
 #endif
 #include <linux/netdevice.h>
+#include <net/gro.h>
 #if KERNEL_VERSION(6, 6, 0) <= LINUX_VERSION_CODE
 #include <net/netdev_rx_queue.h>
 #endif
@@ -2039,10 +2040,10 @@ static inline void napi_gro_flush_list(struct napi_struct *napi)
 {
 	napi_gro_flush(napi, false);
 #if KERNEL_VERSION(5, 4, 0) <= CFG80211_VERSION_CODE
-	if (napi->rx_count) {
-		netif_receive_skb_list(&napi->rx_list);
-		INIT_LIST_HEAD(&napi->rx_list);
-		napi->rx_count = 0;
+	if (napi->gro.rx_count) {
+		netif_receive_skb_list(&napi->gro.rx_list);
+		INIT_LIST_HEAD(&napi->gro.rx_list);
+		napi->gro.rx_count = 0;
 	}
 #endif
 }
@@ -2083,7 +2084,7 @@ void kal_gro_flush(struct ADAPTER *prAdapter)
 		DBGLOG_LIMITED(INIT, TRACE, "napi_gro_flush.\n");
 #if KERNEL_VERSION(5, 4, 0) <= CFG80211_VERSION_CODE
 		prGlueInfo->u4PendingFlushNum =
-			prGlueInfo->napi.rx_count;
+			prGlueInfo->napi.gro.rx_count;
 #else
 		prGlueInfo->u4PendingFlushNum = 0;
 #endif
@@ -7170,6 +7171,23 @@ enum hrtimer_restart kalHrtimerTimeout(struct hrtimer *prHrtimer)
 void kalHrtimerInit(struct hrtimer *prTimer)
 {
 	hrtimer_setup(prTimer, kalHrtimerTimeout, CLOCK_BOOTTIME, HRTIMER_MODE_ABS);
+}
+
+void kalHrtimerStart(struct hrtimer *prTimer, uint32_t delayMs)
+{
+	ktime_t kTargetTime;
+
+	if (!kalHrtimerIsInit(prTimer)) {
+		DBGLOG(INIT, WARN, "hrtimer has not init\n");
+		return;
+	}
+
+	kTargetTime = ktime_get_boottime();
+	kTargetTime = ktime_add(kTargetTime, ms_to_ktime(delayMs));
+
+	if (kalHrtimerIsRunning(prTimer))
+		kalHrtimerCancel(prTimer);
+
 	hrtimer_start(prTimer, kTargetTime, HRTIMER_MODE_ABS);
 
 	DBGLOG(INIT, TRACE, "hrtimer %p %lldms started\n", prTimer, delayMs);

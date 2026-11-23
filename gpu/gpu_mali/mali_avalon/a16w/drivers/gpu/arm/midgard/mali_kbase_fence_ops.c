@@ -73,7 +73,6 @@ const struct dma_fence_ops kbase_fence_ops = { .wait = dma_fence_default_wait,
 					       .get_driver_name = kbase_fence_get_driver_name,
 					       .get_timeline_name = kbase_fence_get_timeline_name,
 					       .enable_signaling = kbase_fence_enable_signaling,
-					       .fence_value_str = kbase_fence_fence_value_str,
 					       .release = kbase_fence_release };
 
 KBASE_EXPORT_TEST_API(kbase_fence_ops);

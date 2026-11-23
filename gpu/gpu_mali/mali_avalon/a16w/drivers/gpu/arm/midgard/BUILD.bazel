@@ -55,6 +55,7 @@ ddk_headers(
         ":midgard_headers",
         "//vendor/mediatek/kernel_modules/gpu/gpu_mali/mali_avalon/a16w:kernel_headers",
         "//vendor/mediatek/kernel_modules/gpu/gpu_mali/mali_avalon/a16w/drivers/gpu/arm:mali_arbitration_shared_config_defaults",
+        "//common:drivers/devfreq/governor.h",
     ],
 )
 

@@ -8277,16 +8277,17 @@ void mtk_cfg_del_intf_link(struct wiphy *wiphy,
 #if (CFG_ADVANCED_80211_MLO == 1) || \
 	(KERNEL_VERSION(6, 1, 0) <= CFG80211_VERSION_CODE)
 int mtk_cfg_add_key(struct wiphy *wiphy,
-		    struct net_device *ndev, int link_id, u8 key_index,
+		    struct wireless_dev *wdev, int link_id, u8 key_index,
 		    bool pairwise, const u8 *mac_addr,
 		    struct key_params *params)
 #else
 int mtk_cfg_add_key(struct wiphy *wiphy,
-		    struct net_device *ndev, u8 key_index,
+		    struct wireless_dev *wdev, u8 key_index,
 		    bool pairwise, const u8 *mac_addr,
 		    struct key_params *params)
 #endif
 {
+	struct net_device *ndev __maybe_unused = wdev->netdev;
 	struct GLUE_INFO *prGlueInfo = NULL;
 	int i4LinkId = MLD_LINK_ID_NONE;
 
@@ -8318,16 +8319,17 @@ int mtk_cfg_add_key(struct wiphy *wiphy,
 #if (CFG_ADVANCED_80211_MLO == 1) || \
 	(KERNEL_VERSION(6, 1, 0) <= CFG80211_VERSION_CODE)
 int mtk_cfg_get_key(struct wiphy *wiphy,
-		    struct net_device *ndev, int link_id, u8 key_index,
+		    struct wireless_dev *wdev, int link_id, u8 key_index,
 		    bool pairwise, const u8 *mac_addr, void *cookie,
 		    void (*callback)(void *cookie, struct key_params *))
 #else
 int mtk_cfg_get_key(struct wiphy *wiphy,
-		    struct net_device *ndev, u8 key_index,
+		    struct wireless_dev *wdev, u8 key_index,
 		    bool pairwise, const u8 *mac_addr, void *cookie,
 		    void (*callback)(void *cookie, struct key_params *))
 #endif
 {
+	struct net_device *ndev __maybe_unused = wdev->netdev;
 	struct GLUE_INFO *prGlueInfo = NULL;
 	int i4LinkId = MLD_LINK_ID_NONE;
 
@@ -8358,14 +8360,15 @@ int mtk_cfg_get_key(struct wiphy *wiphy,
 #if (CFG_ADVANCED_80211_MLO == 1) || \
 	(KERNEL_VERSION(6, 1, 0) <= CFG80211_VERSION_CODE)
 int mtk_cfg_del_key(struct wiphy *wiphy,
-		    struct net_device *ndev, int link_id, u8 key_index,
+		    struct wireless_dev *wdev, int link_id, u8 key_index,
 		    bool pairwise, const u8 *mac_addr)
 #else
 int mtk_cfg_del_key(struct wiphy *wiphy,
-		    struct net_device *ndev, u8 key_index,
+		    struct wireless_dev *wdev, u8 key_index,
 		    bool pairwise, const u8 *mac_addr)
 #endif
 {
+	struct net_device *ndev __maybe_unused = wdev->netdev;
 	struct GLUE_INFO *prGlueInfo = NULL;
 	int i4LinkId = MLD_LINK_ID_NONE;
 
@@ -8434,12 +8437,13 @@ int mtk_cfg_set_default_key(struct wiphy *wiphy,
 #if (CFG_ADVANCED_80211_MLO == 1) || \
 	(KERNEL_VERSION(6, 1, 0) <= CFG80211_VERSION_CODE)
 int mtk_cfg_set_default_mgmt_key(struct wiphy *wiphy,
-		struct net_device *ndev, int link_id, u8 key_index)
+		struct wireless_dev *wdev, int link_id, u8 key_index)
 #else
 int mtk_cfg_set_default_mgmt_key(struct wiphy *wiphy,
-		struct net_device *ndev, u8 key_index)
+		struct wireless_dev *wdev, u8 key_index)
 #endif
 {
+	struct net_device *ndev __maybe_unused = wdev->netdev;
 	struct GLUE_INFO *prGlueInfo = NULL;
 	int i4LinkId = MLD_LINK_ID_NONE;
 
@@ -8515,14 +8519,15 @@ int mtk_cfg_get_channel(struct wiphy *wiphy,
 
 #if KERNEL_VERSION(3, 16, 0) <= CFG80211_VERSION_CODE
 int mtk_cfg_get_station(struct wiphy *wiphy,
-			struct net_device *ndev,
+			struct wireless_dev *wdev,
 			const u8 *mac, struct station_info *sinfo)
 #else
 int mtk_cfg_get_station(struct wiphy *wiphy,
-			struct net_device *ndev,
+			struct wireless_dev *wdev,
 			u8 *mac, struct station_info *sinfo)
 #endif
 {
+	struct net_device *ndev __maybe_unused = wdev->netdev;
 	struct GLUE_INFO *prGlueInfo = NULL;
 
 	WIPHY_PRIV(wiphy, prGlueInfo);
@@ -8545,14 +8550,15 @@ int mtk_cfg_get_station(struct wiphy *wiphy,
 #if CFG_SUPPORT_TDLS
 #if KERNEL_VERSION(3, 16, 0) <= CFG80211_VERSION_CODE
 int mtk_cfg_change_station(struct wiphy *wiphy,
-			   struct net_device *ndev,
+			   struct wireless_dev *wdev,
 			   const u8 *mac, struct station_parameters *params)
 #else
 int mtk_cfg_change_station(struct wiphy *wiphy,
-			   struct net_device *ndev,
+			   struct wireless_dev *wdev,
 			   u8 *mac, struct station_parameters *params)
 #endif
 {
+	struct net_device *ndev __maybe_unused = wdev->netdev;
 	struct GLUE_INFO *prGlueInfo = NULL;
 
 	WIPHY_PRIV(wiphy, prGlueInfo);
@@ -8576,14 +8582,15 @@ int mtk_cfg_change_station(struct wiphy *wiphy,
 
 #if KERNEL_VERSION(3, 16, 0) <= CFG80211_VERSION_CODE
 int mtk_cfg_add_station(struct wiphy *wiphy,
-			struct net_device *ndev,
+			struct wireless_dev *wdev,
 			const u8 *mac, struct station_parameters *params)
 #else
 int mtk_cfg_add_station(struct wiphy *wiphy,
-			struct net_device *ndev,
+			struct wireless_dev *wdev,
 			u8 *mac, struct station_parameters *params)
 #endif
 {
+	struct net_device *ndev __maybe_unused = wdev->netdev;
 	struct GLUE_INFO *prGlueInfo = NULL;
 
 	WIPHY_PRIV(wiphy, prGlueInfo);
@@ -8828,17 +8835,18 @@ void mtk_tdls_cancel_channel_switch(struct wiphy *wiphy,
 
 #if KERNEL_VERSION(3, 19, 0) <= CFG80211_VERSION_CODE
 int mtk_cfg_del_station(struct wiphy *wiphy,
-			struct net_device *ndev,
+			struct wireless_dev *wdev,
 			struct station_del_parameters *params)
 #elif KERNEL_VERSION(3, 16, 0) <= CFG80211_VERSION_CODE
 int mtk_cfg_del_station(struct wiphy *wiphy,
-			struct net_device *ndev,
+			struct wireless_dev *wdev,
 			const u8 *mac)
 #else
 int mtk_cfg_del_station(struct wiphy *wiphy,
-			struct net_device *ndev, u8 *mac)
+			struct wireless_dev *wdev, u8 *mac)
 #endif
 {
+	struct net_device *ndev __maybe_unused = wdev->netdev;
 	struct GLUE_INFO *prGlueInfo = NULL;
 
 	WIPHY_PRIV(wiphy, prGlueInfo);
@@ -9354,7 +9362,8 @@ int mtk_cfg_assoc(struct wiphy *wiphy,
 int mtk_cfg_remain_on_channel(struct wiphy *wiphy,
 			      struct wireless_dev *wdev,
 			      struct ieee80211_channel *chan,
-			      unsigned int duration, u64 *cookie)
+			      unsigned int duration, u64 *cookie,
+			      const u8 *rx_addr)
 {
 	struct GLUE_INFO *prGlueInfo = NULL;
 
@@ -9797,7 +9806,7 @@ int mtk_cfg_stop_ap(struct wiphy *wiphy, struct net_device *dev)
 #endif
 }
 
-int mtk_cfg_set_wiphy_params(struct wiphy *wiphy,
+int mtk_cfg_set_wiphy_params(struct wiphy *wiphy, int radio_idx,
 			     u32 changed)
 {
 	struct GLUE_INFO *prGlueInfo = NULL;
@@ -9848,7 +9857,7 @@ int mtk_cfg_set_bitrate_mask(struct wiphy *wiphy,
 }
 
 int mtk_cfg_set_txpower(struct wiphy *wiphy,
-			struct wireless_dev *wdev,
+			struct wireless_dev *wdev, int radio_idx,
 			enum nl80211_tx_power_setting type, int mbm)
 {
 	struct GLUE_INFO *prGlueInfo = NULL;
@@ -9870,7 +9879,7 @@ int mtk_cfg_set_txpower(struct wiphy *wiphy,
 }
 
 int mtk_cfg_get_txpower(struct wiphy *wiphy,
-			struct wireless_dev *wdev,
+			struct wireless_dev *wdev, int radio_idx,
 #if KERNEL_VERSION(6, 14, 0) <= CFG80211_VERSION_CODE
 			unsigned int link_id,
 #endif
