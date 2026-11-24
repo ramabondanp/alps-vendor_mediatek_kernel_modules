@@ -39,6 +39,7 @@
 #include <media/v4l2-device.h>
 #include <media/videobuf2-v4l2.h>
 #include <media/v4l2-ioctl.h>
+#include <media/v4l2-fh.h>
 #define KERNEL_DMA_BUFFER
 #ifdef KERNEL_DMA_BUFFER
 #include <media/videobuf2-memops.h>
@@ -446,6 +447,7 @@ unsigned int DPE_debug_log_en;
  *
  **************************************************************/
 struct DPE_USER_INFO_STRUCT {
+	struct v4l2_fh fh;
 	pid_t Pid;
 	pid_t Tid;
 };
@@ -5686,11 +5688,36 @@ EXIT:
  ******************************************************************************/
 static int dpe_fop_open(struct file *filp)
 {
-	DPE_open(NULL, filp);
+	struct DPE_USER_INFO_STRUCT *pUserInfo;
+	int ret;
+
+	ret = DPE_open(NULL, filp);
+	if (ret)
+		return ret;
+
+	pUserInfo = filp->private_data;
+	if (!pUserInfo)
+		return -ENOMEM;
+
+	/*
+	 * 6.18 rejects V4L2 nodes that do not use v4l2_fh. fh is the first
+	 * member, so v4l2_fh_add() keeps file->private_data pointing at the
+	 * DPE user info used by the ioctl handlers.
+	 */
+	v4l2_fh_init(&pUserInfo->fh, video_devdata(filp));
+	v4l2_fh_add(&pUserInfo->fh, filp);
 	return 0;
 }
 static int dpe_fop_release(struct file *file)
 {
+	struct DPE_USER_INFO_STRUCT *pUserInfo = file->private_data;
+
+	if (pUserInfo) {
+		v4l2_fh_del(&pUserInfo->fh, file);
+		v4l2_fh_exit(&pUserInfo->fh);
+		/* v4l2_fh_del() clears private_data; DPE_release frees it. */
+		file->private_data = pUserInfo;
+	}
 	DPE_release(NULL, file);
 	return 0;
 }
