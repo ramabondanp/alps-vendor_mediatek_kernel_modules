@@ -1448,7 +1448,7 @@ static int memory_group_manager_probe(struct platform_device *pdev)
 	{
 		int ret;
 		struct sched_param param = { .sched_priority = 2 };
-		mgm_data->refill_worker = kthread_create_worker(0, "mgm_refill_worker");
+		mgm_data->refill_worker = kthread_run_worker(0, "mgm_refill_worker");
 		if (IS_ERR(mgm_data->refill_worker)) {
 			dev_err(&pdev->dev, "Failed to create mgm_refill_worker\n");
 			KBASE_UNREGISTER_SHRINKER(mgm_data->reclaim);

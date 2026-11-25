@@ -132,7 +132,7 @@ int kbase_hwaccess_pm_init(struct kbase_device *kbdev)
 	kbdev->pm.runtime_suspend_result = 0;
 
 #if IS_ENABLED(CONFIG_MALI_MTK_POWEROFF_KTHREAD_WORKER)
-	kbdev->pm.backend.gpu_poweroff_wait_worker = kthread_create_worker(0, "kbase_pm_poweroff_wait");
+	kbdev->pm.backend.gpu_poweroff_wait_worker = kthread_run_worker(0, "kbase_pm_poweroff_wait");
 	dev_info(kbdev->dev, "kthread_create_worker %p %p", kbdev->pm.backend.gpu_poweroff_wait_worker, kbdev->pm.backend.gpu_poweroff_wait_worker->task);
 	if (IS_ERR(kbdev->pm.backend.gpu_poweroff_wait_worker)) {
 		dev_err(kbdev->dev, "Failed to allocate PM Poweroff Wait worker\n");

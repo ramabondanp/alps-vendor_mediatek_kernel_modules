@@ -9153,7 +9153,7 @@ int kbase_csf_scheduler_early_init(struct kbase_device *kbdev)
 #endif /* CONFIG_MALI_MTK_WHITEBOX_MISSING_DOORBELL */
 
 #if IS_ENABLED(CONFIG_MALI_MTK_WORKQUEUE_TO_KTHREAD_WORKER)
-	scheduler->oom_event_kthread_worker = kthread_create_worker(0, "mali-oom-kthread");
+	scheduler->oom_event_kthread_worker = kthread_run_worker(0, "mali-oom-kthread");
 	dev_info(kbdev->dev, "kthread_create_worker %p", scheduler->oom_event_kthread_worker);
 	if (IS_ERR(scheduler->oom_event_kthread_worker)) {
 		dev_err(kbdev->dev, "Failed to allocate oom event worker\n");
@@ -9165,7 +9165,7 @@ int kbase_csf_scheduler_early_init(struct kbase_device *kbdev)
 		dev_warn(kbdev->dev, "Failed to set priority mali-oom-kthread %d\n", oom_ret);
 	}
 
-	scheduler->mmu_page_fault_worker = kthread_create_worker(0, "mali-mmuPF-kthread");
+	scheduler->mmu_page_fault_worker = kthread_run_worker(0, "mali-mmuPF-kthread");
 	dev_info(kbdev->dev, "kthread_create_worker mmu_page_fault_worker %p", scheduler->mmu_page_fault_worker);
 
 	if (IS_ERR(scheduler->mmu_page_fault_worker)) {
@@ -9179,7 +9179,7 @@ int kbase_csf_scheduler_early_init(struct kbase_device *kbdev)
 		dev_warn(kbdev->dev, "Failed to set priority mali-mmu-page-fault-worker-kthread %d\n", mmu_ret);
 	}
 
-	scheduler->jit_destory_worker = kthread_create_worker(0, "mali-jit-kthread");
+	scheduler->jit_destory_worker = kthread_run_worker(0, "mali-jit-kthread");
 	dev_info(kbdev->dev, "kthread_create_worker jit_destory_worker %p", scheduler->jit_destory_worker);
 
 	if (IS_ERR(scheduler->jit_destory_worker)) {
