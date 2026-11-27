@@ -29,9 +29,6 @@
 #include "conn_adaptor.h"
 #include "conn_kern_adaptor.h"
 
-#ifndef FB_EVENT_BLANK
-#define FB_EVENT_BLANK 0x09
-#endif
 
 /*******************************************************************************
 *                         C O M P I L E R   F L A G S

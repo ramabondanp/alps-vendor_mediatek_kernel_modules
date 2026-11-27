@@ -100,9 +100,6 @@
 #if ((CFG_SUPPORT_ICS == 1) || (CFG_SUPPORT_PHY_ICS == 1))
 #include "gl_ics.h"
 
-#ifndef FB_EVENT_BLANK
-#define FB_EVENT_BLANK 0x09
-#endif
 #endif
 
 #if CFG_SUPPORT_MBRAIN

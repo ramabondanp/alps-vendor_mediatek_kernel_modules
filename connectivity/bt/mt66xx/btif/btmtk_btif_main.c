@@ -28,9 +28,6 @@
 #if LINUX_VERSION_CODE >= KERNEL_VERSION(5, 10, 0)
 #include "mtk_disp_notify.h"
 
-#ifndef FB_EVENT_BLANK
-#define FB_EVENT_BLANK 0x09
-#endif
 #endif
 
 /*******************************************************************************
