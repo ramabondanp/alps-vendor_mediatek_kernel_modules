@@ -88,6 +88,7 @@ COPTS_KBASE = [
 
 COPTS_MTK = [
     "-I$(srctree)/include",
+    "-I$(srctree)/drivers/devfreq",
     "-I$(srctree)/drivers/iommu",
     "-I$(srctree)/drivers/staging/android",
     "-I$(srctree)/drivers/staging/android/ion",
