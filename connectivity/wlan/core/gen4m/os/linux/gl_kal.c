@@ -7204,7 +7204,6 @@ void kalHrtimerCancel(struct hrtimer *prTimer)
 	}
 
 	hrtimer_cancel(prTimer);
-	prTimer->function = NULL;
 
 	DBGLOG(INIT, TRACE, "hrtimer %p stopped\n", prTimer);
 }
