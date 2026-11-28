@@ -1791,7 +1791,8 @@ kalP2PGOStationUpdate(struct GLUE_INFO *prGlueInfo,
 #endif
 #endif
 
-		cfg80211_new_sta(netdev_priv(prP2pGlueInfo->aprRoleHandler),
+		cfg80211_new_sta(
+			prP2pGlueInfo->aprRoleHandler->ieee80211_ptr,
 			aucBssid,
 			&rStationInfo, GFP_KERNEL);
 	} else {
@@ -1820,8 +1821,9 @@ kalP2PGOStationUpdate(struct GLUE_INFO *prGlueInfo,
 #endif
 #endif
 
-			cfg80211_del_sta(netdev_priv(prP2pGlueInfo->aprRoleHandler),
-					 aucBssid, GFP_KERNEL);
+			cfg80211_del_sta(
+				prP2pGlueInfo->aprRoleHandler->ieee80211_ptr,
+				aucBssid, GFP_KERNEL);
 		}
 #if CFG_STAINFO_FEATURE
 		kalMemCopy(&prGlueInfo->prAdapter->rSapLastStaRec,
