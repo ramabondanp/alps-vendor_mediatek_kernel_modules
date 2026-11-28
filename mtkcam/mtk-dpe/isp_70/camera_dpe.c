@@ -5473,7 +5473,7 @@ static signed int DPE_open(struct inode *pInode, struct file *pFile)
 	/*  */
 	mutex_lock(&(MutexDPERef));
 	pFile->private_data = NULL;
-	pFile->private_data = kmalloc(sizeof(struct DPE_USER_INFO_STRUCT),
+	pFile->private_data = kzalloc(sizeof(struct DPE_USER_INFO_STRUCT),
 								GFP_ATOMIC);
 	if (pFile->private_data == NULL) {
 		LOG_DBG("kmalloc failed, (proc, pid, tgid)=(%s, %d, %d)",
